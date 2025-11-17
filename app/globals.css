@@ -1,127 +1,322 @@
-:root {
-  color-scheme: dark;
-  --ff-bg: #020617;
-  --ff-text: #e5e7eb;
-  --ff-accent: #22c55e;
-  --ff-muted: #6b7280;
-  --ff-border: #111827;
-  --ff-frog: #22c55e;
-  --ff-flea: #f97316;
-}
+/* Fonts
+   ------------------------------------------------------------------ */
+   @import url("https://fonts.googleapis.com/css2?family=Domine:wght@600;700&family=Noto+Sans:wght@400;500;600&display=swap");
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+   /* Theme tokens
+      ------------------------------------------------------------------ */
+   :root {
+     color-scheme: dark;
+   
+     /* neutrals & surfaces */
+     --ff-bg: #050509;
+     --ff-bg-soft: #0c0d11;
+     --ff-surface: #13141a;
+     --ff-surface-soft: #181922;
+   
+     /* text */
+     --ff-text: #e7e5df;
+     --ff-muted: #a0a1aa;
+   
+     /* accent – warm beige */
+     --ff-accent: #d2b48c;
+     --ff-accent-soft: rgba(210, 180, 140, 0.12);
+   
+     /* borders */
+     --ff-border: #262733;
+   
+     /* category accents – softened */
+     --ff-frog: #c3a671;
+     --ff-flea: #b27a61;
+   
+     /* radii & shadow */
+     --ff-radius-card: 16px;
+     --ff-radius-pill: 999px;
+     --ff-shadow-soft: 0 14px 32px rgba(0, 0, 0, 0.35);
+   }
+   
+   /* Resets
+      ------------------------------------------------------------------ */
+   *,
+   *::before,
+   *::after {
+     box-sizing: border-box;
+   }
+   
+   html,
+   body {
+     margin: 0;
+     padding: 0;
+   
+     font-family: "Noto Sans", sans-serif;
+   
+     /* FIXED gradient — lighter top, smooth blend, no dark band */
+     background: radial-gradient(
+       circle at top center,
+       rgba(255, 255, 255, 0.15) 0%,
+       #5d5970 25%,
+       #474359 70%,
+       #3f3b4e 100%
+     );
+   
+     background-attachment: fixed;
+     color: var(--ff-text);
+   }
+   
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  background: radial-gradient(circle at top, #0f172a, #020617 55%);
-  color: var(--ff-text);
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
+/* Header uses transparent background so it blends */
 .ff-header {
+  background: transparent;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--ff-border);
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 2rem;
-  border-bottom: 1px solid var(--ff-border);
+  padding: 1rem 2.5rem;
   position: sticky;
   top: 0;
-  backdrop-filter: blur(12px);
-  background: rgba(2, 6, 23, 0.88);
   z-index: 10;
 }
 
-.ff-logo {
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-}
 
-.ff-nav {
-  display: flex;
-  gap: 0.75rem;
-}
+   
+   a {
+     color: inherit;
+     text-decoration: none;
+   }
+   
+   /* Layout
+      ------------------------------------------------------------------ */
+   .ff-header {
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     padding: 1rem 2.5rem;
+     border-bottom: 1px solid var(--ff-border);
+     position: sticky;
+     top: 0;
+     backdrop-filter: blur(14px);
+     background: transparent;
 
-.ff-nav-link {
-  font-size: 0.9rem;
-  padding: 0.35rem 0.8rem;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  color: var(--ff-muted);
-}
-
-.ff-nav-link--active {
-  border-color: var(--ff-accent);
-  color: var(--ff-accent);
-  background: rgba(34, 197, 94, 0.08);
-}
-
-.ff-container {
-  max-width: 720px;
-  margin: 2rem auto;
-  padding: 0 1.5rem 3rem;
-}
-
-.ff-container h1 {
-  font-size: 2rem;
-  margin-bottom: 0.25rem;
-}
-
-.ff-container p {
-  margin-top: 0;
-  color: var(--ff-muted);
-}
-
-.ff-section {
-  margin-top: 2rem;
-}
-
-.ff-task-list {
-  list-style: none;
-  margin: 1rem 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.ff-task {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.7rem 0.9rem;
-  border-radius: 0.75rem;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid var(--ff-border);
-}
-
-.ff-task-type {
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 0.25rem 0.5rem;
-  border-radius: 999px;
-  border: 1px solid var(--ff-border);
-}
-
-.ff-task--frog .ff-task-type {
-  border-color: var(--ff-frog);
-  color: var(--ff-frog);
-}
-
-.ff-task--flea .ff-task-type {
-  border-color: var(--ff-flea);
-  color: var(--ff-flea);
-}
+          z-index: 10;
+   }
+   
+   .ff-logo {
+     font-family: "Domine", serif;
+     font-weight: 700;
+     letter-spacing: 0.14em;
+     font-size: 0.85rem;
+     text-transform: uppercase;
+   }
+   
+   .ff-nav {
+     display: flex;
+     gap: 0.75rem;
+   }
+   
+   .ff-nav-link {
+     font-size: 0.9rem;
+     padding: 0.4rem 0.95rem;
+     border-radius: var(--ff-radius-pill);
+     border: 1px solid transparent;
+     color: var(--ff-muted);
+     background: transparent;
+     transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+   }
+   
+   .ff-nav-link:hover {
+     border-color: var(--ff-border);
+     background: transparent;
+     ;
+     color: var(--ff-text);
+   }
+   
+   .ff-nav-link--active {
+     border-color: var(--ff-accent);
+     color: var(--ff-accent);
+     background: var(--ff-accent-soft);
+   }
+   
+   .ff-container {
+     max-width: 840px;
+     margin: 2.4rem auto 3.5rem;
+     padding: 0 2rem;
+   }
+   
+   /* Typography
+      ------------------------------------------------------------------ */
+   .ff-container h1,
+   .ff-container h2,
+   .ff-container h3 {
+     font-family: "Domine", serif;
+     letter-spacing: 0.02em;
+   }
+   
+   .ff-container h1 {
+     font-size: 2.1rem;
+     margin-bottom: 0.2rem;
+   }
+   
+   .ff-container h2 {
+     font-size: 1.3rem;
+     margin-bottom: 0.4rem;
+   }
+   
+   .ff-container h3 {
+     font-size: 1.1rem;
+     margin-bottom: 0.25rem;
+   }
+   
+   .ff-container p {
+     margin-top: 0;
+     color: var(--ff-muted);
+     line-height: 1.6;
+   }
+   
+   .ff-muted {
+     color: var(--ff-muted);
+   }
+   
+   .ff-hint {
+     margin-top: 0.4rem;
+     font-size: 0.85rem;
+     color: var(--ff-muted);
+   }
+   
+   /* Sections & lists
+      ------------------------------------------------------------------ */
+   .ff-section {
+     margin-top: 2.2rem;
+   }
+   
+   .ff-task-list {
+     list-style: none;
+     margin: 1.1rem 0 0;
+     padding: 0;
+     display: flex;
+     flex-direction: column;
+     gap: 0.8rem;
+   }
+   
+   /* Cards / tasks
+      ------------------------------------------------------------------ */
+   .ff-task {
+     display: flex;
+     align-items: center;
+     gap: 0.9rem;
+     padding: 0.9rem 1.05rem;
+   
+     border-radius: var(--ff-radius-card);
+     background: var(--ff-surface);
+     border: 1px solid var(--ff-border);
+     box-shadow: var(--ff-shadow-soft);
+   
+     transition: background 0.15s ease, border-color 0.15s ease;
+   }
+   
+   .ff-task:hover {
+     background: var(--ff-surface-soft);
+     border-color: rgba(210, 180, 140, 0.25);
+   }
+   
+   .ff-task-type {
+     font-size: 0.8rem;
+     font-weight: 600;
+     padding: 0.25rem 0.6rem;
+     border-radius: var(--ff-radius-pill);
+     border: 1px solid var(--ff-border);
+     background: var(--ff-bg-soft);
+   }
+   
+   .ff-task--frog .ff-task-type {
+     border-color: var(--ff-frog);
+     color: var(--ff-frog);
+   }
+   
+   .ff-task--flea .ff-task-type {
+     border-color: var(--ff-flea);
+     color: var(--ff-flea);
+   }
+   
+   /* Inputs / controls
+      ------------------------------------------------------------------ */
+   .ff-input {
+     flex: 1;
+     padding: 0.55rem 0.85rem;
+     border-radius: 0.75rem;
+     border: 1px solid var(--ff-border);
+     background: var(--ff-bg-soft);
+     color: var(--ff-text);
+     font-family: "Noto Sans", sans-serif;
+   }
+   
+   .ff-input:focus {
+     outline: none;
+     border-color: var(--ff-accent);
+     box-shadow: 0 0 0 1px rgba(210, 180, 140, 0.5);
+   }
+   
+   .ff-textarea {
+     width: 100%;
+     padding: 0.55rem 0.85rem;
+     border-radius: 0.75rem;
+     border: 1px solid var(--ff-border);
+     background: var(--ff-bg-soft);
+     color: var(--ff-text);
+     min-height: 10rem;
+     resize: vertical;
+     font-family: "Noto Sans", sans-serif;
+   }
+   
+   .ff-textarea:focus {
+     outline: none;
+     border-color: var(--ff-accent);
+     box-shadow: 0 0 0 1px rgba(210, 180, 140, 0.5);
+   }
+   
+   .ff-button {
+     padding: 0.55rem 1rem;
+     border-radius: 0.9rem;
+     border: 1px solid var(--ff-accent);
+     background: var(--ff-accent-soft);
+     color: var(--ff-accent);
+     font-size: 0.9rem;
+     font-weight: 500;
+     cursor: pointer;
+     box-shadow: var(--ff-shadow-soft);
+     transition: background 0.12s ease, transform 0.08s ease;
+   }
+   
+   .ff-button:hover {
+     background: rgba(210, 180, 140, 0.18);
+   }
+   
+   .ff-button:active {
+     transform: translateY(1px);
+   }
+   
+   .ff-button[disabled] {
+     opacity: 0.55;
+     cursor: default;
+     box-shadow: none;
+   }
+   
+   .ff-select {
+     margin-left: auto;
+     padding: 0.35rem 0.7rem;
+     border-radius: 0.6rem;
+     border: 1px solid var(--ff-border);
+     background: var(--ff-surface-soft);
+     color: var(--ff-text);
+     font-size: 0.85rem;
+   }
+   
+   /* Forms
+      ------------------------------------------------------------------ */
+   .ff-form-vertical {
+     display: flex;
+     flex-direction: column;
+     gap: 0.75rem;
+   }
+   
