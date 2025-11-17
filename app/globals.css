@@ -1,26 +1,127 @@
-@import "tailwindcss";
-
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+  --ff-bg: #020617;
+  --ff-text: #e5e7eb;
+  --ff-accent: #22c55e;
+  --ff-muted: #6b7280;
+  --ff-border: #111827;
+  --ff-frog: #22c55e;
+  --ff-flea: #f97316;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: radial-gradient(circle at top, #0f172a, #020617 55%);
+  color: var(--ff-text);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ff-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--ff-border);
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(12px);
+  background: rgba(2, 6, 23, 0.88);
+  z-index: 10;
+}
+
+.ff-logo {
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.ff-nav {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.ff-nav-link {
+  font-size: 0.9rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  color: var(--ff-muted);
+}
+
+.ff-nav-link--active {
+  border-color: var(--ff-accent);
+  color: var(--ff-accent);
+  background: rgba(34, 197, 94, 0.08);
+}
+
+.ff-container {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1.5rem 3rem;
+}
+
+.ff-container h1 {
+  font-size: 2rem;
+  margin-bottom: 0.25rem;
+}
+
+.ff-container p {
+  margin-top: 0;
+  color: var(--ff-muted);
+}
+
+.ff-section {
+  margin-top: 2rem;
+}
+
+.ff-task-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ff-task {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 0.75rem;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid var(--ff-border);
+}
+
+.ff-task-type {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--ff-border);
+}
+
+.ff-task--frog .ff-task-type {
+  border-color: var(--ff-frog);
+  color: var(--ff-frog);
+}
+
+.ff-task--flea .ff-task-type {
+  border-color: var(--ff-flea);
+  color: var(--ff-flea);
 }
