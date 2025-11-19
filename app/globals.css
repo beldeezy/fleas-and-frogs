@@ -62,25 +62,6 @@
      color: var(--ff-text);
    }
    
-
-/* Header uses transparent background so it blends */
-.ff-header {
-  background: transparent;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border-bottom: 1px solid var(--ff-border);
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 2.5rem;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-
-   
    a {
      color: inherit;
      text-decoration: none;
@@ -93,13 +74,13 @@
      align-items: center;
      justify-content: space-between;
      padding: 1rem 2.5rem;
-     border-bottom: 1px solid var(--ff-border);
+     border-bottom: 1px solid transparent;
      position: sticky;
      top: 0;
      backdrop-filter: blur(14px);
+     -webkit-backdrop-filter: blur(14px);
      background: transparent;
-
-          z-index: 10;
+     z-index: 10;
    }
    
    .ff-logo {
@@ -128,7 +109,6 @@
    .ff-nav-link:hover {
      border-color: var(--ff-border);
      background: transparent;
-     ;
      color: var(--ff-text);
    }
    
@@ -204,6 +184,7 @@
    .ff-task {
      display: flex;
      align-items: center;
+     justify-content: space-between; /* NEW: space text + controls */
      gap: 0.9rem;
      padding: 0.9rem 1.05rem;
    
@@ -220,6 +201,38 @@
      border-color: rgba(210, 180, 140, 0.25);
    }
    
+   /* NEW: main content area in a task row */
+   .ff-task-main {
+     flex: 1 1 auto;
+     min-width: 0;
+   }
+   
+   /* NEW: right-aligned controls (dropdowns, icons, buttons) */
+   .ff-task-controls {
+     display: flex;
+     align-items: center;
+     gap: 0.5rem;
+     margin-left: auto;
+   }
+   
+   /* NEW: full-width Life Priority input row styled like a task bar */
+   .ff-task-input-row {
+     margin-top: 0.9rem;
+     margin-bottom: 0.75rem;
+   }
+   
+   /* NEW: input that grows to fill task-width */
+   .ff-input-grow {
+     width: 100%;
+     flex: 1 1 auto;
+   }
+   
+   /* Optional: subtle checkmark style */
+   .ff-check {
+     font-size: 0.9rem;
+     opacity: 0.8;
+   }
+   
    .ff-task-type {
      font-size: 0.8rem;
      font-weight: 600;
@@ -228,7 +241,12 @@
      border: 1px solid var(--ff-border);
      background: var(--ff-bg-soft);
    }
-   
+   .ff-pill-rank {
+    margin-right: 0.45rem; /* spacing between 1. and Faith */
+    padding: 0.25rem 0.55rem;
+    font-weight: 600;
+  }
+  
    .ff-task--frog .ff-task-type {
      border-color: var(--ff-frog);
      color: var(--ff-frog);
@@ -285,11 +303,11 @@
      font-weight: 500;
      cursor: pointer;
      box-shadow: var(--ff-shadow-soft);
-     transition: background 0.12s ease, transform 0.08s ease;
+     transition: background 0.12s ease, transform 0.08s ease, color 0.12s ease;
    }
    
    .ff-button:hover {
-     background: rgba(210, 180, 140, 0.18);
+     color: rgba(255, 255, 255, 0.7);
    }
    
    .ff-button:active {

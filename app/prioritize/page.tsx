@@ -1,172 +1,331 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { useTaskStore } from "@/lib/tasks";
-
-const DEFAULT_PRIORITY_NAMES = [
-  "Faith",
-  "Family",
-  "Finance",
-  "Future",
-  "Fitness",
-  "Fun",
-  "Fleas",
-  "Frogs",
-];
+import { useEffect, useState, type MouseEvent, DragEvent } from "react";
+import { useTaskStore } from "../../src/store/taskStore";
+import { usePriorityStore } from "../../src/store/priorityStore";
 
 export default function PrioritizePage() {
+  // ---- Tasks ----
   const tasks = useTaskStore((state) => state.tasks);
-  const priorities = useTaskStore((state) => state.priorities);
-  const mindDumpConfirmed = useTaskStore((state) => state.mindDumpConfirmed);
-  const setPriorities = useTaskStore((state) => state.setPriorities);
-  const assignTaskPriority = useTaskStore((state) => state.assignTaskPriority);
+  const tasksHydrated = useTaskStore((state) => state.hydrated);
+  const loadTasks = useTaskStore((state) => state.loadTasks);
+  const setTaskPriority = useTaskStore((state) => state.setTaskPriority);
 
-  const [priorityText, setPriorityText] = useState(
-    DEFAULT_PRIORITY_NAMES.join("\n")
+  // ---- Life Priorities ----
+  const priorities = usePriorityStore((state) => state.priorities);
+  const prioritiesHydrated = usePriorityStore((state) => state.hydrated);
+  const loadPriorities = usePriorityStore((state) => state.loadPriorities);
+  const addPriority = usePriorityStore((state) => state.addPriority);
+  const deletePriority = usePriorityStore((state) => state.deletePriority);
+  const reorderPriorities = usePriorityStore(
+    (state) => state.reorderPriorities
   );
 
-  const unprioritized = tasks.filter((t) => t.priorityId == null);
-  const prioritized = tasks.filter((t) => t.priorityId != null);
+  const hydrated = tasksHydrated && prioritiesHydrated;
 
-  // 1) If Mind Dump isn't confirmed, show lock screen
-  if (!mindDumpConfirmed) {
-    return (
-      <main className="ff-container">
-        <h1>Prioritize</h1>
-        <p className="ff-muted">
-          This stage unlocks after you complete your Mind Dump.
-        </p>
-        <section className="ff-section">
-          <p className="ff-hint">
-            Go back to <strong>Mind Dump</strong>, list everything on your mind,
-            then confirm you’re done to move forward.
-          </p>
-        </section>
-      </main>
-    );
-  }
+  // ---- Local UI state ----
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [newPriorityName, setNewPriorityName] = useState("");
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
 
-  // 2) If no priorities defined yet, ask user to define their Life Priorities
-  const handlePrioritiesSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    const names = priorityText
-      .split("\n")
-      .map((line) => line.trim())
-      .filter(Boolean);
-    if (!names.length) return;
-    setPriorities(names);
+  useEffect(() => {
+    loadTasks();
+    loadPriorities();
+  }, [loadTasks, loadPriorities]);
+
+  // ---- Derived lists ----
+  const unprioritizedTasks = tasks.filter((t) => !t.priorityId);
+  const prioritizedTasksRaw = tasks.filter((t) => t.priorityId);
+
+  const prioritizedTasks = prioritizedTasksRaw
+    .map((task) => {
+      const priority = priorities.find((p) => p.id === task.priorityId);
+      return { task, priority };
+    })
+    .sort((a, b) => {
+      const ao = a.priority?.order ?? 0;
+      const bo = b.priority?.order ?? 0;
+      return ao - bo;
+    });
+
+  // ---- Priority handlers ----
+  const handleAddPriority = async (e?: MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
+    const name = newPriorityName.trim();
+    if (!name) return;
+
+    await addPriority(name);
+    setNewPriorityName("");
   };
 
-  if (!priorities.length) {
-    return (
-      <main className="ff-container">
-        <h1>Prioritize</h1>
-        <p className="ff-muted">
-          Define your Life Priorities so you can sort tasks into what matters
-          most.
-        </p>
+  const handleDeletePriorityClick = async (id: string) => {
+    await deletePriority(id);
+  };
 
-        <section className="ff-section">
-          <form
-            onSubmit={handlePrioritiesSubmit}
-            className="ff-form-vertical"
-          >
-            <p className="ff-hint">
-              One priority per line. Example: the 8F’s (Faith, Family, Finance,
-              Future, Fitness, Fun, Fleas, Frogs).
-            </p>
-            <textarea
-              id="priorityText"
-              className="ff-textarea"
-              value={priorityText}
-              onChange={(e) => setPriorityText(e.target.value)}
-            />
-            <div>
-              <button type="submit" className="ff-button">
-                Save priorities
-              </button>
-            </div>
-          </form>
-        </section>
-      </main>
-    );
-  }
+  const handleDragStart = (index: number) => {
+    setDragIndex(index);
+  };
 
-  // 3) Normal prioritization UI once everything is unlocked
+  const handleDragOver = (e: DragEvent<HTMLLIElement>, index: number) => {
+    e.preventDefault();
+    if (dragIndex === null || dragIndex === index) return;
+
+    const updated = [...priorities];
+    const [moved] = updated.splice(dragIndex, 1);
+    updated.splice(index, 0, moved);
+
+    const withOrder = updated.map((p, idx) => ({
+      ...p,
+      order: idx,
+    }));
+
+    reorderPriorities(withOrder);
+    setDragIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDragIndex(null);
+  };
+
+  // ---- Task priority handlers ----
+  const handleSelectTask = (taskId: string) => {
+    setSelectedTaskId(taskId);
+  };
+
+  const handleChangeTaskPriority = async (
+    taskId: string,
+    value: string
+  ) => {
+    const priorityId = value === "" ? null : value;
+    await setTaskPriority(taskId, priorityId);
+
+    if (priorityId) {
+      setSelectedTaskId(null);
+    }
+  };
+
   return (
     <main className="ff-container">
       <h1>Prioritize</h1>
       <p className="ff-muted">
-        Sort tasks into your core life priorities (like Faith, Family, Finance,
-        Future, Fitness, Fun, Fleas, Frogs).
+        Shape your Life Priorities, then assign each task so you&apos;re
+        spending effort where it matters most.
       </p>
 
-      <section className="ff-section">
-        <h2>Unassigned tasks</h2>
-        <ul className="ff-task-list">
-          {unprioritized.map((task) => (
-            <li key={task.id} className="ff-task">
-              <span>{task.label}</span>
-              <select
-                className="ff-select"
-                value={task.priorityId ?? ""}
-                onChange={(e) =>
-                  assignTaskPriority(task.id, Number(e.target.value))
-                }
-              >
-                <option value="">Choose priority…</option>
-                {priorities.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </li>
-          ))}
-        </ul>
-        {!unprioritized.length && (
-          <p className="ff-hint">
-            All tasks currently have a priority. Add more in Mind Dump if
-            needed.
-          </p>
-        )}
-      </section>
+      {!hydrated && (
+        <p className="ff-hint">Loading your tasks and priorities…</p>
+      )}
 
-      <section className="ff-section">
-        <h2>Tasks by priority</h2>
-        {priorities.map((priority) => {
-          const tasksForPriority = prioritized.filter(
-            (t) => t.priorityId === priority.id
-          );
-          if (!tasksForPriority.length) return null;
-          return (
-            <div key={priority.id} style={{ marginBottom: "1rem" }}>
-              <h3>{priority.name}</h3>
-              <ul className="ff-task-list">
-                {tasksForPriority.map((task) => (
-                  <li key={task.id} className="ff-task">
-                    <span>{task.label}</span>
+      {hydrated && (
+        <>
+          {/* -------------------- Life Priorities (rank + delete) -------------------- */}
+          <section className="ff-section">
+            <h2>Life Priorities</h2>
+            <p className="ff-hint">
+              Create your core priorities, then drag to rank them. Higher on
+              the list = more important.
+            </p>
+
+            {/* Full-width input row styled like a task bar */}
+            <div className="ff-task ff-task-input-row">
+              <div className="ff-task-main">
+                <input
+                  type="text"
+                  className="ff-input ff-input-grow"
+                  placeholder="Add a Life Priority (e.g., Faith, Family, Craft)"
+                  value={newPriorityName}
+                  onChange={(e) => setNewPriorityName(e.target.value)}
+                />
+              </div>
+              <div className="ff-task-controls">
+                <button
+                  type="button"
+                  className="ff-button ff-button-sm"
+                  onClick={handleAddPriority}
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+
+            {/* Draggable priority list */}
+            <ul className="ff-task-list ff-priority-list">
+              {priorities.map((priority, index) => (
+                <li
+                  key={priority.id}
+                  className={`ff-task ff-priority ${
+                    dragIndex === index ? "ff-priority--dragging" : ""
+                  }`}
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDragEnd={handleDragEnd}
+                >
+                  <div className="ff-task-main">
+                    <span className="ff-drag-handle" aria-hidden="true">
+                      ⋮⋮
+                    </span>
+                    <span className="ff-pill ff-pill-rank">
+                      {index + 1}.
+                    </span>
+                    <span className="ff-priority-name">
+                      {priority.name}
+                    </span>
+
+                  </div>
+
+                  <div className="ff-task-controls">
+                    <button
+                      type="button"
+                      className="ff-icon-button"
+                      aria-label={`Delete priority ${priority.name}`}
+                      onClick={() =>
+                        handleDeletePriorityClick(priority.id)
+                      }
+                    >
+                      🗑
+                    </button>
+                  </div>
+                </li>
+              ))}
+
+              {priorities.length === 0 && (
+                <li className="ff-task ff-empty">
+                  <span className="ff-hint">
+                    No Life Priorities yet. Add at least one to start
+                    shaping where you want your time to go.
+                  </span>
+                </li>
+              )}
+            </ul>
+          </section>
+
+          {/* -------------------- Unprioritized tasks -------------------- */}
+          <section className="ff-section">
+            <h2>Unprioritized tasks</h2>
+            <p className="ff-hint">
+              Choose which Life Priority each task belongs to. Tasks with a
+              priority will move to the section below.
+            </p>
+
+            <ul className="ff-task-list">
+              {unprioritizedTasks.map((task) => (
+                <li
+                  key={task.id}
+                  className={`ff-task ${
+                    selectedTaskId === task.id
+                      ? "ff-task--selected"
+                      : ""
+                  }`}
+                  onClick={() => handleSelectTask(task.id)}
+                >
+                  <div className="ff-task-main">
+                    <span>{task.title}</span>
+                  </div>
+
+                  <div className="ff-task-controls">
                     <select
                       className="ff-select"
                       value={task.priorityId ?? ""}
                       onChange={(e) =>
-                        assignTaskPriority(task.id, Number(e.target.value))
+                        handleChangeTaskPriority(
+                          task.id,
+                          e.target.value
+                        )
                       }
                     >
-                      <option value="">Choose priority…</option>
-                      {priorities.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.name}
+                      <option value="">Unassigned</option>
+                      {priorities.map((priority, index) => (
+                        <option key={priority.id} value={priority.id}>
+                          {index + 1}. {priority.name}
                         </option>
                       ))}
                     </select>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-        })}
-      </section>
+
+                    {task.priorityId && (
+                      <span className="ff-check" aria-label="Prioritized">
+                        ✓
+                      </span>
+                    )}
+                  </div>
+                </li>
+              ))}
+
+              {unprioritizedTasks.length === 0 && tasks.length > 0 && (
+                <li className="ff-task ff-empty">
+                  <span className="ff-hint">
+                    You&apos;ve already assigned all tasks to Life
+                    Priorities.
+                  </span>
+                </li>
+              )}
+
+              {tasks.length === 0 && (
+                <li className="ff-task ff-empty">
+                  <span className="ff-hint">
+                    No tasks yet. Capture a few in the Mind Dump first.
+                  </span>
+                </li>
+              )}
+            </ul>
+          </section>
+
+          {/* -------------------- Prioritized tasks -------------------- */}
+          <section className="ff-section">
+            <h2>Prioritized tasks</h2>
+            <p className="ff-hint">
+              These tasks already belong to a Life Priority. Use this list
+              as a quick overview of where your energy is going.
+            </p>
+
+            <ul className="ff-task-list">
+              {prioritizedTasks.map(({ task }) => (
+                <li key={task.id} className="ff-task">
+                  <div className="ff-task-main">
+                    {/* Only show the task title here */}
+                    <span>{task.title}</span>
+                  </div>
+
+                  <div className="ff-task-controls">
+                    <select
+                      className="ff-select"
+                      value={task.priorityId ?? ""}
+                      onChange={(e) =>
+                        handleChangeTaskPriority(
+                          task.id,
+                          e.target.value
+                        )
+                      }
+                    >
+                      <option value="">Unassigned</option>
+                      {priorities.map((p, index) => (
+                        <option key={p.id} value={p.id}>
+                          {index + 1}. {p.name}
+                        </option>
+                      ))}
+                    </select>
+
+                    {task.priorityId && (
+                      <span className="ff-check" aria-label="Prioritized">
+                        ✓
+                      </span>
+                    )}
+                  </div>
+                </li>
+              ))}
+
+              {prioritizedTasks.length === 0 && (
+                <li className="ff-task ff-empty">
+                  <span className="ff-hint">
+                    Once you assign priorities to tasks above, they&apos;ll
+                    show up here.
+                  </span>
+                </li>
+              )}
+            </ul>
+          </section>
+        </>
+      )}
     </main>
   );
 }
