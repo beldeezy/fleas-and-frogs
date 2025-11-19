@@ -1,48 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useTaskStore } from "../../src/store/taskStore"; // adjust path
+import { useEffect } from "react";
+import { useTaskStore } from "../../src/store/taskStore";
 
 export default function InboxPage() {
-  const { tasks, hydrated, loadTasks, createTask } = useTaskStore();
-  const [title, setTitle] = useState("");
+  const tasks = useTaskStore((s) => s.tasks);
+  const hydrated = useTaskStore((s) => s.hydrated);
+  const loadTasks = useTaskStore((s) => s.loadTasks);
 
   useEffect(() => {
     loadTasks();
   }, [loadTasks]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title.trim()) return;
-
-    await createTask({
-      title,
-      areaId: "inbox",      // temporary default
-      status: "todo",
-    });
-
-    setTitle("");
-  };
-
   return (
     <main className="ff-container">
-      <h1>Inbox</h1>
+      <h1>Inbox (deprecated)</h1>
+      <p className="ff-hint">
+        This page is read-only. New tasks should be created from the Mind
+        Dump page.
+      </p>
 
-      {!hydrated && <p>Loading tasks…</p>}
+      {!hydrated && <p className="ff-hint">Loading tasks…</p>}
 
-      <form onSubmit={handleSubmit}>
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="New task…"
-        />
-        <button type="submit">Add</button>
-      </form>
-
-      <ul>
+      <ul className="ff-task-list">
         {tasks.map((t) => (
-          <li key={t.id}>
-            {t.title} – {t.status}
+          <li key={t.id} className="ff-task">
+            {t.title} – {t.status} ({t.areaId ?? "no area"})
           </li>
         ))}
       </ul>

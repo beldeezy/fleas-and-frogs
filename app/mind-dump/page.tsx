@@ -1,18 +1,16 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTaskStore } from "../../src/store/taskStore";
+import { MindDumpInput } from "../../src/components/mind-dump/MindDumpInput";
 
 export default function MindDumpPage() {
   const tasks = useTaskStore((state) => state.tasks);
   const hydrated = useTaskStore((state) => state.hydrated);
   const loadTasks = useTaskStore((state) => state.loadTasks);
-  const addTask = useTaskStore((state) => state.addTask);
   const deleteTask = useTaskStore((state) => state.deleteTask);
-  
 
-  const [input, setInput] = useState("");
   const [mindDumpConfirmed, setMindDumpConfirmed] = useState(false);
 
   const router = useRouter();
@@ -23,21 +21,6 @@ export default function MindDumpPage() {
   }, [loadTasks]);
 
   const mindDumpTasks = tasks.filter((t) => t.areaId === "mind-dump");
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    const trimmed = input.trim();
-    if (!trimmed || mindDumpConfirmed) return;
-
-    await addTask({
-      title: trimmed,
-      areaId: "mind-dump",
-      status: "todo",
-    });
-    
-
-    setInput("");
-  };
 
   const handleDelete = async (taskId: string) => {
     await deleteTask(taskId);
@@ -55,23 +38,9 @@ export default function MindDumpPage() {
       <h1>Mind Dump</h1>
       <p className="ff-muted">Get everything out of your head.</p>
 
-      <form
-        onSubmit={handleSubmit}
-        className="ff-section"
-        style={{ display: "flex", gap: "0.5rem" }}
-      >
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type a task and press Enter…"
-          className="ff-input"
-          disabled={mindDumpConfirmed}
-        />
-        <button type="submit" className="ff-button" disabled={mindDumpConfirmed}>
-          Add
-        </button>
-      </form>
+      <section className="ff-section" style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+        <MindDumpInput disabled={mindDumpConfirmed} />
+      </section>
 
       {!hydrated && <p className="ff-hint">Loading your tasks…</p>}
 
@@ -90,7 +59,6 @@ export default function MindDumpPage() {
             >
               <span>{task.title}</span>
 
-              {/* Subtle trash icon */}
               <button
                 onClick={() => handleDelete(task.id)}
                 aria-label="Delete task"

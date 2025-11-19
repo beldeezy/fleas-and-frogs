@@ -59,7 +59,35 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const tasks = await getAllTasks();
+      const allTasks = await getAllTasks();
+
+      // 🧹 Identify legacy tasks from the old Inbox / pre-areaId days
+      const legacyInboxTasks = allTasks.filter(
+        (t) => t.areaId === "inbox" || !t.areaId
+      );
+
+      // Keep everything else
+      const tasks = allTasks.filter(
+        (t) => !(t.areaId === "inbox" || !t.areaId)
+      );
+
+      // Try to delete legacy tasks from the DB so they never come back
+      if (legacyInboxTasks.length) {
+        try {
+          await Promise.all(
+            legacyInboxTasks.map((t) => repoDeleteTask(t.id))
+          );
+          console.log(
+            `Cleaned up ${legacyInboxTasks.length} legacy inbox tasks`
+          );
+        } catch (cleanupErr) {
+          console.warn(
+            "Failed to fully clean legacy inbox tasks",
+            cleanupErr
+          );
+        }
+      }
+
       set({ tasks, isLoading: false, hydrated: true });
     } catch (err) {
       console.error("loadTasks failed", err);
@@ -71,6 +99,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       });
     }
   },
+
 
   async addTask(input) {
     set({ error: null });
