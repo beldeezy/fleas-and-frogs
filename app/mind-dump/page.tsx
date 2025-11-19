@@ -1,17 +1,21 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTaskStore } from "../../src/store/taskStore";
 
 export default function MindDumpPage() {
   const tasks = useTaskStore((state) => state.tasks);
   const hydrated = useTaskStore((state) => state.hydrated);
   const loadTasks = useTaskStore((state) => state.loadTasks);
-  const createTask = useTaskStore((state) => state.createTask);
+  const addTask = useTaskStore((state) => state.addTask);
   const deleteTask = useTaskStore((state) => state.deleteTask);
+  
 
   const [input, setInput] = useState("");
   const [mindDumpConfirmed, setMindDumpConfirmed] = useState(false);
+
+  const router = useRouter();
 
   // hydrate tasks on mount
   useEffect(() => {
@@ -25,11 +29,12 @@ export default function MindDumpPage() {
     const trimmed = input.trim();
     if (!trimmed || mindDumpConfirmed) return;
 
-    await createTask({
+    await addTask({
       title: trimmed,
       areaId: "mind-dump",
       status: "todo",
     });
+    
 
     setInput("");
   };
@@ -40,7 +45,9 @@ export default function MindDumpPage() {
 
   const confirmMindDump = () => {
     if (!mindDumpTasks.length) return;
+
     setMindDumpConfirmed(true);
+    router.push("/prioritize");
   };
 
   return (

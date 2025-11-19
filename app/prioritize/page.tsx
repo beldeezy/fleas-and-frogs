@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState, type MouseEvent, DragEvent } from "react";
+import { useRouter } from "next/navigation";
 import { useTaskStore } from "../../src/store/taskStore";
 import { usePriorityStore } from "../../src/store/priorityStore";
 
 export default function PrioritizePage() {
+  const router = useRouter();
+
   // ---- Tasks ----
   const tasks = useTaskStore((state) => state.tasks);
   const tasksHydrated = useTaskStore((state) => state.hydrated);
@@ -27,6 +30,7 @@ export default function PrioritizePage() {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [newPriorityName, setNewPriorityName] = useState("");
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [prioritiesConfirmed, setPrioritiesConfirmed] = useState(false);
 
   useEffect(() => {
     loadTasks();
@@ -92,10 +96,7 @@ export default function PrioritizePage() {
     setSelectedTaskId(taskId);
   };
 
-  const handleChangeTaskPriority = async (
-    taskId: string,
-    value: string
-  ) => {
+  const handleChangeTaskPriority = async (taskId: string, value: string) => {
     const priorityId = value === "" ? null : value;
     await setTaskPriority(taskId, priorityId);
 
@@ -103,6 +104,24 @@ export default function PrioritizePage() {
       setSelectedTaskId(null);
     }
   };
+
+  // ---- Confirm priorities -> go to Strategize ----
+  const handleConfirmPriorities = () => {
+    // Require: at least one task, at least one priority, and no unassigned tasks
+    if (!tasks.length || !priorities.length || unprioritizedTasks.length > 0) {
+      return;
+    }
+
+    setPrioritiesConfirmed(true);
+    router.push("/strategize");
+  };
+
+  const canConfirm =
+    hydrated &&
+    !prioritiesConfirmed &&
+    tasks.length > 0 &&
+    priorities.length > 0 &&
+    unprioritizedTasks.length === 0;
 
   return (
     <main className="ff-container">
@@ -171,7 +190,6 @@ export default function PrioritizePage() {
                     <span className="ff-priority-name">
                       {priority.name}
                     </span>
-
                   </div>
 
                   <div className="ff-task-controls">
@@ -282,7 +300,6 @@ export default function PrioritizePage() {
               {prioritizedTasks.map(({ task }) => (
                 <li key={task.id} className="ff-task">
                   <div className="ff-task-main">
-                    {/* Only show the task title here */}
                     <span>{task.title}</span>
                   </div>
 
@@ -323,6 +340,24 @@ export default function PrioritizePage() {
                 </li>
               )}
             </ul>
+          </section>
+
+          {/* -------------------- Confirm priorities -> Strategize -------------------- */}
+          <section className="ff-section">
+            <button
+              type="button"
+              className="ff-button"
+              onClick={handleConfirmPriorities}
+              disabled={!canConfirm}
+            >
+              {prioritiesConfirmed
+                ? "Priorities confirmed"
+                : "I’ve assigned every task to a Life Priority"}
+            </button>
+            <p className="ff-hint">
+              When every task has a Life Priority, you&apos;re ready to move
+              into the Strategize stage and place them in the Eisenhower Matrix.
+            </p>
           </section>
         </>
       )}

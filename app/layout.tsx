@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import "./globals.css";
+
+import Header from "../src/components/Header"; 
 
 export const metadata: Metadata = {
   title: "Fleas & Frogs",
@@ -15,20 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <header className="ff-header">
-          <div className="ff-logo">F&F</div>
-          <nav className="ff-nav">
-            <Link href="/mind-dump" className="ff-nav-link ff-nav-link--active">
-              Mind Dump
-            </Link>
-            <Link href="/prioritize" className="ff-nav-link">
-              Prioritize
-            </Link>
-            <Link href="/strategize" className="ff-nav-link">
-              Strategize
-            </Link>
-          </nav>
-        </header>
+        <Header />
         {children}
       </body>
     </html>

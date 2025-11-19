@@ -3,7 +3,7 @@ import type { Task, EisenhowerValue } from "../../src/lib/schema/index";
 
 import {
   computePrioritizedTasks,
-  groupTasksByEisenhower
+  groupTasksByEisenhower,
 } from "../lib/tasks/logic";
 
 import {
@@ -13,14 +13,14 @@ import {
   updateTask as _repoUpdateTask,
   setTaskPriority as _repoSetTaskPriority,
   setTaskEisenhower as _repoSetTaskEisenhower,
-  // deleteTask as _repoDeleteTask,
+  deleteTask as _repoDeleteTask,
 } from "../lib/db/tasks-repo";
 
 // 🔧 Loosen repo typings where needed
 const repoUpdateTask: any = _repoUpdateTask;
 const repoSetTaskPriority: any = _repoSetTaskPriority;
 const repoSetTaskEisenhower: any = _repoSetTaskEisenhower;
-// const repoDeleteTask: any = _repoDeleteTask;
+const repoDeleteTask: any = _repoDeleteTask;
 
 export type TaskPriority = string | null;
 
@@ -30,14 +30,14 @@ type TaskStore = {
   error: string | null;
   hydrated: boolean;
 
-  // 👇 NEW: computed views that use pure logic helpers
+  // 👇 computed views that use pure logic helpers
   prioritizedTasks: () => Task[];
   eisenhowerBuckets: () => Record<EisenhowerValue | "none", Task[]>;
 
   loadTasks: () => Promise<void>;
   addTask: (input: NewTaskInput) => Promise<void>;
   updateTask: (id: string, patch: Partial<Task>) => Promise<void>;
-  deleteTask?: (id: string) => Promise<void>;
+  deleteTask: (id: string) => Promise<void>;
 
   setTaskPriority: (id: string, priorityId: TaskPriority) => Promise<void>;
   setTaskEisenhower: (id: string, value: EisenhowerValue) => Promise<void>;
@@ -122,23 +122,26 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }
   },
 
-  // async deleteTask(id) {
-  //   set({ error: null });
-  //   const prevTasks = get().tasks;
-  //   const nextTasks = prevTasks.filter((t) => t.id !== id);
-  //   set({ tasks: nextTasks });
-  //
-  //   try {
-  //     await repoDeleteTask(id);
-  //   } catch (err) {
-  //     console.error("deleteTask failed; rolling back", err);
-  //     set({ tasks: prevTasks });
-  //     set({
-  //       error:
-  //         err instanceof Error ? err.message : "Failed to delete task",
-  //     });
-  //   }
-  // },
+  async deleteTask(id) {
+    set({ error: null });
+
+    const prevTasks = get().tasks;
+    const nextTasks = prevTasks.filter((t) => t.id !== id);
+
+    // ✅ Optimistic removal
+    set({ tasks: nextTasks });
+
+    try {
+      await repoDeleteTask(id);
+    } catch (err) {
+      console.error("deleteTask failed; rolling back", err);
+      set({ tasks: prevTasks });
+      set({
+        error:
+          err instanceof Error ? err.message : "Failed to delete task",
+      });
+    }
+  },
 
   async setTaskPriority(id, priorityId) {
     set({ error: null });
