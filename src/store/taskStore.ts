@@ -2,6 +2,11 @@ import { create } from "zustand";
 import type { Task, EisenhowerValue } from "../../src/lib/schema/index";
 
 import {
+  computePrioritizedTasks,
+  groupTasksByEisenhower
+} from "../lib/tasks/logic";
+
+import {
   type NewTaskInput,
   getAllTasks,
   addTask,
@@ -25,6 +30,10 @@ type TaskStore = {
   error: string | null;
   hydrated: boolean;
 
+  // 👇 NEW: computed views that use pure logic helpers
+  prioritizedTasks: () => Task[];
+  eisenhowerBuckets: () => Record<EisenhowerValue | "none", Task[]>;
+
   loadTasks: () => Promise<void>;
   addTask: (input: NewTaskInput) => Promise<void>;
   updateTask: (id: string, patch: Partial<Task>) => Promise<void>;
@@ -39,6 +48,11 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   isLoading: false,
   error: null,
   hydrated: false,
+
+  // 👇 These two just delegate to the helpers in src/lib/tasks/logic.ts
+  prioritizedTasks: () => computePrioritizedTasks(get().tasks),
+
+  eisenhowerBuckets: () => groupTasksByEisenhower(get().tasks),
 
   async loadTasks() {
     if (get().isLoading) return;
