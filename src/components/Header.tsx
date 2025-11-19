@@ -14,7 +14,9 @@ export default function Header() {
 
   return (
     <header className="ff-header">
-      <div className="ff-logo">F&F</div>
+      <Link href="/" className="ff-logo">
+        F&F
+      </Link>
 
       <nav className="ff-nav">
         {navItems.map((item) => {

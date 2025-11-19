@@ -293,42 +293,84 @@
      box-shadow: 0 0 0 1px rgba(210, 180, 140, 0.5);
    }
    
-   .ff-button {
-     padding: 0.55rem 1rem;
-     border-radius: 0.9rem;
-     border: 1px solid var(--ff-accent);
-     background: var(--ff-accent-soft);
-     color: var(--ff-accent);
-     font-size: 0.9rem;
-     font-weight: 500;
-     cursor: pointer;
-     box-shadow: var(--ff-shadow-soft);
-     transition: background 0.12s ease, transform 0.08s ease, color 0.12s ease;
-   }
-   
-   .ff-button:hover {
-     color: rgba(255, 255, 255, 0.7);
-   }
-   
-   .ff-button:active {
-     transform: translateY(1px);
-   }
-   
-   .ff-button[disabled] {
-     opacity: 0.55;
-     cursor: default;
-     box-shadow: none;
-   }
-   
-   .ff-select {
-     margin-left: auto;
-     padding: 0.35rem 0.7rem;
-     border-radius: 0.6rem;
-     border: 1px solid var(--ff-border);
-     background: var(--ff-surface-soft);
-     color: var(--ff-text);
-     font-size: 0.85rem;
-   }
+  /* Base button */
+.ff-button {
+  display: inline-block;
+  padding: 0.7rem 1.4rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--ff-accent);
+  background: var(--ff-accent-soft);
+  color: var(--ff-accent);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--ff-shadow-soft);
+  transition:
+    background 0.12s ease,
+    transform 0.08s ease,
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.ff-button:hover {
+  background: var(--ff-accent);
+  color: white;
+}
+
+.ff-button:active {
+  transform: translateY(1px);
+}
+
+.ff-button[disabled] {
+  opacity: 0.55;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* Primary CTA version (used for Home Screen “Get Started”) */
+.ff-btn-primary {
+  display: inline-block;
+  padding: 0.8rem 1.6rem;
+  border-radius: 1rem;
+  background: var(--ff-accent);
+  border: 1px solid var(--ff-accent);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--ff-shadow-soft);
+  transition:
+    background 0.15s ease,
+    transform 0.08s ease,
+    color 0.15s ease;
+}
+
+.ff-btn-primary:hover {
+  background: var(--ff-accent-strong);
+}
+
+.ff-btn-primary:active {
+  transform: translateY(1px);
+}
+
+.ff-btn-primary[disabled] {
+  opacity: 0.6;
+  cursor: default;
+  box-shadow: none;
+}
+
+
+/* Select element remains unchanged */
+.ff-select {
+  margin-left: auto;
+  padding: 0.35rem 0.7rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--ff-border);
+  background: var(--ff-surface-soft);
+  color: var(--ff-text);
+  font-size: 0.85rem;
+}
+
    
    /* Forms
       ------------------------------------------------------------------ */
