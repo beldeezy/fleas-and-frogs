@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-// Adjust import to your actual header component
 import Header from "../Header";
 
 type AppShellProps = {
@@ -15,8 +14,20 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <>
+      {/* Header hidden during onboarding */}
       {!isOnboarding && <Header />}
-      <main>{children}</main>
+
+      <main>
+        {/* 
+          Normal pages get the centered container 
+          Onboarding pages take full width 
+        */}
+        {isOnboarding ? (
+          children
+        ) : (
+          <div className="ff-container">{children}</div>
+        )}
+      </main>
     </>
   );
 }

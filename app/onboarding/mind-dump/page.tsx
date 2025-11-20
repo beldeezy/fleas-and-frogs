@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useTaskStore } from "../../../src/store/taskStore";
 import { MindDumpInput } from "../../../src/components/mind-dump/MindDumpInput";
 import { MindDumpTaskList } from "../../../src/components/mind-dump/MindDumpTaskList";
-import { useOnboardingStepControl } from "../../../src/components/onboarding/OnboardingShell";
 
 export default function OnboardingMindDumpPage() {
   const tasks = useTaskStore((s) => s.tasks);
@@ -13,27 +12,19 @@ export default function OnboardingMindDumpPage() {
   const error = useTaskStore((s) => s.error);
   const clearError = useTaskStore((s) => s.clearError);
 
-  const { setCanProceed } = useOnboardingStepControl();
-
   useEffect(() => {
     loadTasks();
   }, [loadTasks]);
 
   const mindDumpTasks = tasks.filter((t) => t.areaId === "mind-dump");
 
-  // Guardrail: enable Next only when at least one mind-dump task exists
-  useEffect(() => {
-    const ok = hydrated && mindDumpTasks.length > 0;
-    setCanProceed(ok);
-  }, [hydrated, mindDumpTasks.length, setCanProceed]);
-
   return (
     <section className="onboarding-step">
       <header className="onboarding-step-header">
-        <h1>Capture everything on your mind</h1>
+        <h1>Mind Dump</h1>
         <p>
-          Dump every task, idea, and worry into the list below. Don&apos;t sort
-          or judge anything yet—just get it out of your head.
+          Dump every task, idea, and worry into the list below. For now, just
+          get it out of your head.
         </p>
       </header>
 

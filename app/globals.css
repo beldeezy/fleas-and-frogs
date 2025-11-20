@@ -385,91 +385,97 @@
     font-size: 0.8rem;
     opacity: 0.8;
   }
+  
 
-  .onboarding-shell {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 1.5rem 1.25rem 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-  
-  .onboarding-shell-header {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .onboarding-shell-step-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-  
-  .onboarding-shell-step-count {
-    font-size: 0.85rem;
-    font-weight: 500;
-    opacity: 0.8;
-  }
-  
-  .onboarding-shell-step-label {
-    font-size: 1rem;
-    font-weight: 600;
-  }
-  
-  .onboarding-shell-progress-bar {
-    position: relative;
-    width: 100%;
-    height: 0.4rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
-    overflow: hidden;
-  }
-  
-  .onboarding-shell-progress-fill {
-    height: 100%;
-    border-radius: 999px;
-    background: var(--ff-accent, #53ffc9);
-    transition: width 0.18s ease-out;
-  }
-  
-  .onboarding-shell-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .onboarding-shell-footer {
-    display: flex;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-top: 0.5rem;
-  }
-  
-  .onboarding-shell-back.ff-button[disabled] {
-    opacity: 0.5;
-    cursor: default;
-  }
-  
-  .onboarding-step {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .onboarding-step-header h1 {
-    font-size: 1.4rem;
-    margin-bottom: 0.25rem;
-  }
-  
-  .onboarding-step-header p {
-    font-size: 0.95rem;
-    opacity: 0.85;
-  }
-  
-  .onboarding-step-main {
-    margin-top: 0.5rem;
-  }
-  
+  /* Onboarding shell layout
+   ------------------------------------------------------------------ */
+
+.onboarding-shell {
+  padding-top: 1.25rem;
+}
+
+/* Header with step label + progress bar */
+.onboarding-shell-header {
+  padding: 0.75rem 0 0.5rem;
+}
+
+.onboarding-shell-header .ff-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.onboarding-shell-step-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.onboarding-shell-step-count {
+  color: var(--ff-muted);
+}
+
+.onboarding-shell-step-label {
+  font-weight: 600;
+}
+
+/* Progress bar */
+.onboarding-shell-progress-bar {
+  position: relative;
+  width: 100%;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.onboarding-shell-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ff-accent);
+  box-shadow: 0 0 12px rgba(210, 180, 140, 0.7);
+  transition: width 0.2s ease-out;
+}
+
+/* Body + footer spacing */
+.onboarding-shell-body {
+  padding-top: 0.5rem;
+  padding-bottom: 1.75rem;
+}
+
+.onboarding-shell-footer {
+  padding-bottom: 2.5rem;
+}
+
+.onboarding-shell-footer .ff-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.onboarding-exit-button {
+  background: transparent;
+  border: none;
+  color: var(--ff-muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  transition: color 0.12s ease, background 0.12s ease;
+}
+
+.onboarding-exit-button:hover {
+  color: var(--ff-text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.onboarding-exit-button:active {
+  transform: translateY(1px);
+}
+.onboarding-shell-top-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+

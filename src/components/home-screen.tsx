@@ -26,7 +26,7 @@ export default function HomeScreen() {
 
       {/* CTA */}
       <div className="mt-6">
-        <Link href="/onboarding/mind-dump">
+        <Link href="/onboarding">
           <button className="ff-button">Get Started</button>
         </Link>
       </div>

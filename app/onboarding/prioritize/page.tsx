@@ -132,7 +132,7 @@ export default function OnboardingPrioritizePage() {
   return (
     <section className="onboarding-step">
       <header className="onboarding-step-header">
-        <h1>Prioritize what matters most</h1>
+        <h1>Prioritize</h1>
         <p>
           Define your Life Priorities, rank them, and assign each task so your
           energy lines up with what you say matters.

@@ -56,9 +56,9 @@ export default function OnboardingStrategizePage() {
   return (
     <section className="onboarding-step">
       <header className="onboarding-step-header">
-        <h1>Turn priorities into a plan</h1>
+        <h1>Strategize</h1>
         <p>
-          Use the Eisenhower Matrix inside each Life Priority to decide what to
+          Drag and drop each task inside each Life Priority to decide what to
           do now, what to schedule, what to delegate, and what to drop.
         </p>
       </header>

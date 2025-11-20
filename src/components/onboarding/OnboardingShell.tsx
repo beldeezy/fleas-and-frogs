@@ -1,15 +1,8 @@
 "use client";
 
-import {
-  usePathname,
-  useRouter
-} from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import {
-  createContext,
-  useContext,
-  useState
-} from "react";
+import { createContext, useContext, useState } from "react";
 
 const ONBOARDING_STEPS = [
   { path: "/onboarding/mind-dump", label: "Mind Dump" },
@@ -29,14 +22,21 @@ type OnboardingStepControlContextValue = {
 const OnboardingStepControlContext =
   createContext<OnboardingStepControlContextValue | null>(null);
 
+const defaultStepControl: OnboardingStepControlContextValue = {
+  canProceed: false,
+  setCanProceed: () => {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn(
+        "[Fleas&Frogs] useOnboardingStepControl used outside OnboardingShell; Next will stay disabled."
+      );
+    }
+  },
+};
+
+// Hook for child pages to control whether Next is enabled
 export function useOnboardingStepControl() {
   const ctx = useContext(OnboardingStepControlContext);
-  if (!ctx) {
-    throw new Error(
-      "useOnboardingStepControl must be used within OnboardingShell"
-    );
-  }
-  return ctx;
+  return ctx ?? defaultStepControl;
 }
 
 export function OnboardingShell({ children }: OnboardingShellProps) {
@@ -67,7 +67,7 @@ export function OnboardingShell({ children }: OnboardingShellProps) {
       const nextStep = ONBOARDING_STEPS[safeIndex + 1];
       router.push(nextStep.path);
     } else {
-      // ✅ After onboarding, go to dashboard
+      // After onboarding, go to dashboard
       router.push("/dashboard");
     }
   };
@@ -79,6 +79,10 @@ export function OnboardingShell({ children }: OnboardingShellProps) {
     }
   };
 
+  const handleExit = () => {
+    router.push("/dashboard");
+  };
+
   const progressPercent = (stepNumber / totalSteps) * 100;
 
   return (
@@ -86,44 +90,74 @@ export function OnboardingShell({ children }: OnboardingShellProps) {
       value={{ canProceed, setCanProceed }}
     >
       <div className="onboarding-shell">
+        {/* HEADER */}
         <header className="onboarding-shell-header">
-          <div className="onboarding-shell-step-meta">
-            <span className="onboarding-shell-step-count">
-              Step {stepNumber} of {totalSteps}
-            </span>
-            <span className="onboarding-shell-step-label">
-              {ONBOARDING_STEPS[safeIndex]?.label}
-            </span>
-          </div>
+          <div className="ff-container">
+            {/* Top row: step text + Exit */}
+            <div className="onboarding-shell-top-row">
+              <div className="onboarding-shell-step-meta">
+                <span className="onboarding-shell-step-count">
+                  Step {stepNumber} of {totalSteps}
+                </span>
+                <span className="onboarding-shell-step-label">
+                  {ONBOARDING_STEPS[safeIndex]?.label}
+                </span>
+              </div>
 
-          <div className="onboarding-shell-progress-bar">
-            <div
-              className="onboarding-shell-progress-fill"
-              style={{ width: `${progressPercent}%` }}
-            />
+              <button
+                type="button"
+                onClick={handleExit}
+                className="onboarding-exit-button"
+                aria-label="Exit onboarding and return to dashboard"
+              >
+                Exit
+              </button>
+            </div>
+
+            {/* Progress bar under the row, full width */}
+            <div className="onboarding-shell-progress-bar">
+              <div
+                className="onboarding-shell-progress-fill"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
           </div>
         </header>
 
-        <main className="onboarding-shell-body">{children}</main>
+        {/* BODY */}
+        <main className="onboarding-shell-body">
+          <div className="ff-container">{children}</div>
+        </main>
 
+        {/* FOOTER */}
         <footer className="onboarding-shell-footer">
-          <button
-            type="button"
-            className="ff-button onboarding-shell-back"
-            onClick={handleBack}
-            disabled={isFirst}
-          >
-            Back
-          </button>
+          <div className="ff-container">
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "0.75rem",
+              }}
+            >
+              <button
+                type="button"
+                className="ff-button onboarding-shell-back"
+                onClick={handleBack}
+                disabled={isFirst}
+              >
+                Back
+              </button>
 
-          <button
-            type="button"
-            className="ff-button onboarding-shell-next"
-            onClick={handleNext}
-            disabled={!canProceed}
-          >
-            {isLast ? "Finish" : "Next"}
-          </button>
+              <button
+                type="button"
+                className="ff-button onboarding-shell-next"
+                onClick={handleNext}
+                disabled={!canProceed}
+              >
+                {isLast ? "Finish" : "Next"}
+              </button>
+            </div>
+          </div>
         </footer>
       </div>
     </OnboardingStepControlContext.Provider>
