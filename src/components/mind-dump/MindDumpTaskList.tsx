@@ -3,11 +3,10 @@
 import { useTaskStore } from "../../store/taskStore";
 
 export function MindDumpTaskList() {
-  const { tasks, hydrated, deleteTask } = useTaskStore((s) => ({
-    tasks: s.tasks,
-    hydrated: s.hydrated,
-    deleteTask: s.deleteTask,
-  }));
+  // ✅ FIXED: use separate selectors to prevent infinite re-renders
+  const tasks = useTaskStore((s) => s.tasks);
+  const hydrated = useTaskStore((s) => s.hydrated);
+  const deleteTask = useTaskStore((s) => s.deleteTask);
 
   const mindDumpTasks = tasks.filter((t) => t.areaId === "mind-dump");
 
@@ -16,7 +15,6 @@ export function MindDumpTaskList() {
       await deleteTask(taskId);
     } catch (err) {
       console.error("Failed to delete task:", err);
-      // store handles error state; page shows banner
     }
   };
 

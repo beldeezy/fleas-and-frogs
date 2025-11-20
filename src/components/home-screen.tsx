@@ -11,7 +11,7 @@ export default function HomeScreen() {
       <ul className="mt-4 list-disc list-inside space-y-2">
         <li>
           <strong>"Fleas"</strong> are small, repetitive, annoying tasks you just
-          can’t seem to get rid of … yet.
+          can’t get rid of … yet.
         </li>
         <li>
           <strong>"Frogs"</strong> are the big things you’ve been putting off
@@ -25,9 +25,9 @@ export default function HomeScreen() {
       </p>
 
       {/* CTA */}
-      <div className="mt-8">
-        <Link href="/mind-dump" className="ff-btn-primary">
-          Get Started
+      <div className="mt-6">
+        <Link href="/onboarding/mind-dump">
+          <button className="ff-button">Get Started</button>
         </Link>
       </div>
     </main>
