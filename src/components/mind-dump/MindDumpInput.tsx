@@ -14,8 +14,10 @@ export function MindDumpInput({ disabled = false }: MindDumpInputProps) {
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
+  // 🔑 Use simple selectors to avoid the external store warning
   const tasks = useTaskStore((s) => s.tasks);
   const addTask = useTaskStore((s) => s.addTask);
+  const clearError = useTaskStore((s) => s.clearError);
 
   // helper: normalized string
   const normalize = (s: string) => s.trim().toLowerCase();
@@ -64,6 +66,7 @@ export function MindDumpInput({ disabled = false }: MindDumpInputProps) {
 
       setValue("");
       setDuplicateWarning(null);
+      clearError(); // clear any previous error on success
 
       // re-focus after add
       if (textareaRef.current) {
@@ -71,6 +74,7 @@ export function MindDumpInput({ disabled = false }: MindDumpInputProps) {
       }
     } catch (err) {
       console.error("Failed to add task:", err);
+      // store will handle the user-facing error message
     }
   };
 
@@ -134,7 +138,6 @@ export function MindDumpInput({ disabled = false }: MindDumpInputProps) {
           </p>
         )}
 
-        {/* Optional explicit button for mouse users */}
         <button
           type="button"
           className="ff-button"

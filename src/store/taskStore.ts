@@ -24,6 +24,33 @@ const repoDeleteTask: any = _repoDeleteTask;
 
 export type TaskPriority = string | null;
 
+// 🔒 Small helpers to keep state safe and predictable
+const safeDeleteTask = (tasks: Task[], id: string): Task[] => {
+  const next = tasks.filter((t) => t.id !== id);
+  if (next.length === tasks.length) {
+    console.warn("safeDeleteTask: no task with id", id);
+    return tasks;
+  }
+  return next;
+};
+
+const safeReplaceTask = (tasks: Task[], saved: Task): Task[] => {
+  let found = false;
+  const next = tasks.map((t) => {
+    if (t.id === saved.id) {
+      found = true;
+      return saved;
+    }
+    return t;
+  });
+
+  if (!found) {
+    console.warn("safeReplaceTask: no task with id", saved.id);
+    return tasks;
+  }
+  return next;
+};
+
 type TaskStore = {
   tasks: Task[];
   isLoading: boolean;
@@ -41,6 +68,8 @@ type TaskStore = {
 
   setTaskPriority: (id: string, priorityId: TaskPriority) => Promise<void>;
   setTaskEisenhower: (id: string, value: EisenhowerValue) => Promise<void>;
+
+  clearError: () => void;
 };
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
@@ -51,8 +80,9 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
 
   // 👇 These two just delegate to the helpers in src/lib/tasks/logic.ts
   prioritizedTasks: () => computePrioritizedTasks(get().tasks),
-
   eisenhowerBuckets: () => groupTasksByEisenhower(get().tasks),
+
+  clearError: () => set({ error: null }),
 
   async loadTasks() {
     if (get().isLoading) return;
@@ -74,9 +104,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       // Try to delete legacy tasks from the DB so they never come back
       if (legacyInboxTasks.length) {
         try {
-          await Promise.all(
-            legacyInboxTasks.map((t) => repoDeleteTask(t.id))
-          );
+          await Promise.all(legacyInboxTasks.map((t) => repoDeleteTask(t.id)));
           console.log(
             `Cleaned up ${legacyInboxTasks.length} legacy inbox tasks`
           );
@@ -88,29 +116,43 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         }
       }
 
-      set({ tasks, isLoading: false, hydrated: true });
+      set({
+        tasks: Array.isArray(tasks) ? tasks : [],
+        isLoading: false,
+        hydrated: true,
+        error: null,
+      });
     } catch (err) {
       console.error("loadTasks failed", err);
       set({
         isLoading: false,
         hydrated: true, // we tried; stop showing "loading"
+        tasks: [],
         error:
           err instanceof Error ? err.message : "Failed to load tasks",
       });
     }
   },
 
-
   async addTask(input) {
-    set({ error: null });
+    const prevTasks = get().tasks ?? [];
+    set({ isLoading: true, error: null });
+
     try {
       const created = await addTask(input);
-      set((state) => ({
-        tasks: [...state.tasks, created],
-      }));
+      if (!created) {
+        throw new Error("addTask: repo returned no task");
+      }
+
+      set({
+        tasks: [...prevTasks, created],
+        isLoading: false,
+      });
     } catch (err) {
       console.error("addTask failed", err);
       set({
+        tasks: prevTasks,
+        isLoading: false,
         error:
           err instanceof Error ? err.message : "Failed to add task",
       });
@@ -118,33 +160,39 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   },
 
   async updateTask(id, patch) {
-    set({ error: null });
+    const prevTasks = get().tasks ?? [];
+    if (!prevTasks.length) {
+      console.warn("updateTask: no tasks in store");
+      return;
+    }
 
-    const prevTasks = get().tasks;
-    const idx = prevTasks.findIndex((t) => t.id === id);
-    if (idx === -1) {
+    const existing = prevTasks.find((t) => t.id === id);
+    if (!existing) {
       console.warn("updateTask: no task with id", id);
       return;
     }
 
-    const existing = prevTasks[idx];
-    const updatedTask: Task = { ...existing, ...patch };
+    const localUpdated: Task = { ...existing, ...patch };
 
     // ✅ Optimistic local update
-    const optimistic = [...prevTasks];
-    optimistic[idx] = updatedTask;
-    set({ tasks: optimistic });
+    const optimistic = prevTasks.map((t) =>
+      t.id === id ? localUpdated : t
+    );
+
+    set({ tasks: optimistic, isLoading: true, error: null });
 
     try {
       // ✅ Repo expects a full Task object
-      const saved: Task = await repoUpdateTask(updatedTask);
+      const saved: Task = await repoUpdateTask(localUpdated);
       set((state) => ({
-        tasks: state.tasks.map((t) => (t.id === id ? saved : t)),
+        tasks: safeReplaceTask(state.tasks ?? [], saved),
+        isLoading: false,
       }));
     } catch (err) {
       console.error("updateTask failed; rolling back", err);
-      set({ tasks: prevTasks });
       set({
+        tasks: prevTasks,
+        isLoading: false,
         error:
           err instanceof Error ? err.message : "Failed to update task",
       });
@@ -152,20 +200,20 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   },
 
   async deleteTask(id) {
-    set({ error: null });
+    const prevTasks = get().tasks ?? [];
+    set({ isLoading: true, error: null });
 
-    const prevTasks = get().tasks;
-    const nextTasks = prevTasks.filter((t) => t.id !== id);
-
-    // ✅ Optimistic removal
-    set({ tasks: nextTasks });
+    const optimistic = safeDeleteTask(prevTasks, id);
+    set({ tasks: optimistic });
 
     try {
       await repoDeleteTask(id);
+      set({ isLoading: false });
     } catch (err) {
       console.error("deleteTask failed; rolling back", err);
-      set({ tasks: prevTasks });
       set({
+        tasks: prevTasks,
+        isLoading: false,
         error:
           err instanceof Error ? err.message : "Failed to delete task",
       });
@@ -173,9 +221,8 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   },
 
   async setTaskPriority(id, priorityId) {
-    set({ error: null });
-
-    const prevTasks = get().tasks;
+    const prevTasks = get().tasks ?? [];
+    set({ isLoading: true, error: null });
 
     // ✅ Optimistic update uses the correct field: priorityId
     const optimistic = prevTasks.map((t) =>
@@ -188,14 +235,14 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     try {
       const updated: Task = await repoSetTaskPriority(id, priorityId);
       set((state) => ({
-        tasks: state.tasks.map((t) =>
-          t.id === id ? updated : t
-        ),
+        tasks: safeReplaceTask(state.tasks ?? [], updated),
+        isLoading: false,
       }));
     } catch (err) {
       console.error("setTaskPriority failed; rolling back", err);
-      set({ tasks: prevTasks });
       set({
+        tasks: prevTasks,
+        isLoading: false,
         error:
           err instanceof Error
             ? err.message
@@ -205,9 +252,9 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   },
 
   async setTaskEisenhower(id, value) {
-    set({ error: null });
+    const prevTasks = get().tasks ?? [];
+    set({ isLoading: true, error: null });
 
-    const prevTasks = get().tasks;
     const optimistic = prevTasks.map((t) =>
       t.id === id ? { ...t, eisenhower: value ?? undefined } : t
     );
@@ -216,14 +263,14 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     try {
       const updated: Task = await repoSetTaskEisenhower(id, value);
       set((state) => ({
-        tasks: state.tasks.map((t) =>
-          t.id === id ? updated : t
-        ),
+        tasks: safeReplaceTask(state.tasks ?? [], updated),
+        isLoading: false,
       }));
     } catch (err) {
       console.error("setTaskEisenhower failed; rolling back", err);
-      set({ tasks: prevTasks });
       set({
+        tasks: prevTasks,
+        isLoading: false,
         error:
           err instanceof Error
             ? err.message

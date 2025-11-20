@@ -13,6 +13,9 @@ export default function PrioritizePage() {
   const tasksHydrated = useTaskStore((state) => state.hydrated);
   const loadTasks = useTaskStore((state) => state.loadTasks);
   const setTaskPriority = useTaskStore((state) => state.setTaskPriority);
+  const isLoading = useTaskStore((state) => state.isLoading);
+  const error = useTaskStore((state) => state.error);
+  const clearError = useTaskStore((state) => state.clearError);
 
   // ---- Life Priorities ----
   const priorities = usePriorityStore((state) => state.priorities);
@@ -131,8 +134,28 @@ export default function PrioritizePage() {
         spending effort where it matters most.
       </p>
 
+      {/* Global loading + updating hints */}
       {!hydrated && (
         <p className="ff-hint">Loading your tasks and priorities…</p>
+      )}
+
+      {hydrated && isLoading && (
+        <p className="ff-hint">Updating tasks…</p>
+      )}
+
+      {/* Error banner */}
+      {error && (
+        <div className="ff-error-banner">
+          <span>{error}</span>
+          <button
+            type="button"
+            onClick={clearError}
+            className="ff-icon-button"
+            aria-label="Dismiss error"
+          >
+            ×
+          </button>
+        </div>
       )}
 
       {hydrated && (
