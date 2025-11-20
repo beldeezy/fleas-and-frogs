@@ -1,23 +1,17 @@
-import type { Metadata } from "next";
+// app/layout.tsx
+import type { ReactNode } from "react";
 import "./globals.css";
-
-import Header from "../src/components/Header"; 
-
-export const metadata: Metadata = {
-  title: "Fleas & Frogs",
-  description: "Local-first planner for clearing fleas and tackling frogs.",
-};
+import { AppShell } from "../src/components/layout/AppShell";
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <html lang="en">
       <body>
-        <Header />
-        {children}
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
