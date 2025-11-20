@@ -10,6 +10,8 @@ export default function MindDumpPage() {
   const hydrated = useTaskStore((state) => state.hydrated);
   const loadTasks = useTaskStore((state) => state.loadTasks);
   const deleteTask = useTaskStore((state) => state.deleteTask);
+  const error = useTaskStore((state) => state.error);
+  const clearError = useTaskStore((state) => state.clearError);
 
   const [mindDumpConfirmed, setMindDumpConfirmed] = useState(false);
 
@@ -23,7 +25,12 @@ export default function MindDumpPage() {
   const mindDumpTasks = tasks.filter((t) => t.areaId === "mind-dump");
 
   const handleDelete = async (taskId: string) => {
-    await deleteTask(taskId);
+    try {
+      await deleteTask(taskId);
+    } catch (err) {
+      console.error("Failed to delete task:", err);
+      // store already sets a user-facing error
+    }
   };
 
   const confirmMindDump = () => {
@@ -38,7 +45,24 @@ export default function MindDumpPage() {
       <h1>Mind Dump</h1>
       <p className="ff-muted">Get everything out of your head.</p>
 
-      <section className="ff-section" style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+      {error && (
+        <div className="ff-error-banner">
+          <span>{error}</span>
+          <button
+            type="button"
+            onClick={clearError}
+            className="ff-icon-button"
+            aria-label="Dismiss error"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      <section
+        className="ff-section"
+        style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+      >
         <MindDumpInput disabled={mindDumpConfirmed} />
       </section>
 

@@ -45,14 +45,25 @@ export function EisenhowerMatrix({
       return;
     }
 
-    await setTaskEisenhower(draggingTaskId, quadrant);
-    setDraggingTaskId(null);
+    try {
+      await setTaskEisenhower(draggingTaskId, quadrant);
+    } finally {
+      setDraggingTaskId(null);
+    }
   };
 
   const handleUnsortedDragOver = (e: DragEvent<HTMLDivElement>) => {
     // Just to allow smooth drag leave/enter; no drop here.
     e.preventDefault();
   };
+
+  // lightweight breadcrumb for debugging this layer if needed
+  console.log(
+    "EisenhowerMatrix render:",
+    priorityName,
+    "tasksForPriority=",
+    tasksForPriority.length
+  );
 
   return (
     <section className="ff-section">
@@ -70,7 +81,10 @@ export function EisenhowerMatrix({
       />
 
       {/* Unsorted tasks */}
-      <div style={{ marginTop: "1.25rem" }} onDragOver={handleUnsortedDragOver}>
+      <div
+        style={{ marginTop: "1.25rem" }}
+        onDragOver={handleUnsortedDragOver}
+      >
         <h3>Unsorted tasks</h3>
         <p className="ff-hint">
           Drag these into a quadrant above to place them.
