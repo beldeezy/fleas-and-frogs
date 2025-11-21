@@ -1,3 +1,4 @@
+// src/lib/schema/index.ts
 import { z } from "zod";
 
 export const AreaSchema = z.object({
@@ -37,3 +38,39 @@ export const TaskSchema = z.object({
 });
 
 export type Task = z.infer<typeof TaskSchema>;
+
+// ----- Plan / Calendar -----
+
+export const RECURRENCE_VALUES = ["none", "daily", "weekly"] as const;
+export type RecurrenceRule = (typeof RECURRENCE_VALUES)[number];
+
+export const CalendarBlockSchema = z.object({
+  id: z.string(),
+  taskId: z.string().nullable().optional(),
+
+  title: z.string(),
+  notes: z.string().nullable().optional(),
+
+  // Store as ISO strings for Dexie friendliness
+  start: z.string(), // ISO datetime
+  end: z.string(),   // ISO datetime
+
+  recurrence: z.enum(RECURRENCE_VALUES).optional(), // v1: none/daily/weekly
+
+  color: z.string().nullable().optional(),
+
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export type CalendarBlock = z.infer<typeof CalendarBlockSchema>;
+
+// For creating new blocks from UI
+export const NewCalendarBlockInputSchema = CalendarBlockSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type NewCalendarBlockInput = z.infer<
+  typeof NewCalendarBlockInputSchema
+>;

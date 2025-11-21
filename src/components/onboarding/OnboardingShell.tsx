@@ -67,8 +67,8 @@ export function OnboardingShell({ children }: OnboardingShellProps) {
       const nextStep = ONBOARDING_STEPS[safeIndex + 1];
       router.push(nextStep.path);
     } else {
-      // After onboarding, go to dashboard
-      router.push("/dashboard");
+      // After onboarding, go to Plan
+      router.push("/plan");
     }
   };
 

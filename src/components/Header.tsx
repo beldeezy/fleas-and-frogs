@@ -10,6 +10,8 @@ export default function Header() {
     { href: "/mind-dump", label: "Mind Dump" },
     { href: "/prioritize", label: "Prioritize" },
     { href: "/strategize", label: "Strategize" },
+    { href: "/plan", label: "Plan" },          // ✅ Added
+    { href: "/do", label: "Do" },              // ✅ Added
   ];
 
   return (

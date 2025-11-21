@@ -1,10 +1,12 @@
+// src/lib/db/fnf-db.ts
 import Dexie, { Table } from "dexie";
-import { Task, Area, Priority } from "../schema";
+import { Task, Area, Priority, CalendarBlock } from "../schema";
 
 export class FNFDatabase extends Dexie {
   tasks!: Table<Task, string>;
   areas!: Table<Area, string>;
   priorities!: Table<Priority, string>;
+  calendar_blocks!: Table<CalendarBlock, string>;
 
   constructor() {
     super("fleas_frogs_db");
@@ -34,6 +36,14 @@ export class FNFDatabase extends Dexie {
       tasks: "id, areaId, status, priorityId, eisenhower, createdAt",
       areas: "id",
       priorities: "id, createdAt, order",
+    });
+
+    // v5: add calendar_blocks table
+    this.version(5).stores({
+      tasks: "id, areaId, status, priorityId, eisenhower, createdAt",
+      areas: "id",
+      priorities: "id, createdAt, order",
+      calendar_blocks: "id, start, end, taskId",
     });
   }
 }
