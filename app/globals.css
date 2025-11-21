@@ -119,7 +119,7 @@
    }
    
    .ff-container {
-     max-width: 840px;
+     max-width: 1040px;
      margin: 2.4rem auto 3.5rem;
      padding: 0 2rem;
    }
@@ -184,7 +184,7 @@
    .ff-task {
      display: flex;
      align-items: center;
-     justify-content: space-between; /* NEW: space text + controls */
+     justify-content: space-between;
      gap: 0.9rem;
      padding: 0.9rem 1.05rem;
    
@@ -201,281 +201,478 @@
      border-color: rgba(210, 180, 140, 0.25);
    }
    
-   /* NEW: main content area in a task row */
    .ff-task-main {
-     flex: 1 1 auto;
+     display: flex;
+     flex-direction: column;
+     gap: 0.25rem;
      min-width: 0;
    }
    
-   /* NEW: right-aligned controls (dropdowns, icons, buttons) */
-   .ff-task-controls {
+   .ff-task-title {
+     font-size: 0.95rem;
+     font-weight: 500;
+     color: var(--ff-text);
+     word-break: break-word;
+   }
+   
+   .ff-task-meta {
      display: flex;
-     align-items: center;
-     gap: 0.5rem;
-     margin-left: auto;
-   }
-   
-   /* NEW: full-width Life Priority input row styled like a task bar */
-   .ff-task-input-row {
-     margin-top: 0.9rem;
-     margin-bottom: 0.75rem;
-   }
-   
-   /* NEW: input that grows to fill task-width */
-   .ff-input-grow {
-     width: 100%;
-     flex: 1 1 auto;
-   }
-   
-   /* Optional: subtle checkmark style */
-   .ff-check {
-     font-size: 0.9rem;
-     opacity: 0.8;
-   }
-   
-   .ff-task-type {
+     flex-wrap: wrap;
+     gap: 0.3rem 0.75rem;
      font-size: 0.8rem;
-     font-weight: 600;
-     padding: 0.25rem 0.6rem;
-     border-radius: var(--ff-radius-pill);
-     border: 1px solid var(--ff-border);
-     background: var(--ff-bg-soft);
-   }
-   .ff-pill-rank {
-    margin-right: 0.45rem; /* spacing between 1. and Faith */
-    padding: 0.25rem 0.55rem;
-    font-weight: 600;
-  }
-  
-   .ff-task--frog .ff-task-type {
-     border-color: var(--ff-frog);
-     color: var(--ff-frog);
+     color: var(--ff-muted);
    }
    
-   .ff-task--flea .ff-task-type {
-     border-color: var(--ff-flea);
-     color: var(--ff-flea);
+   .ff-task-actions {
+     display: flex;
+     flex-direction: column;
+     align-items: flex-end;
+     gap: 0.35rem;
    }
    
-   /* Inputs / controls
+   /* Buttons & inputs
       ------------------------------------------------------------------ */
-   .ff-input {
-     flex: 1;
-     padding: 0.55rem 0.85rem;
-     border-radius: 0.75rem;
-     border: 1px solid var(--ff-border);
-     background: var(--ff-bg-soft);
-     color: var(--ff-text);
-     font-family: "Noto Sans", sans-serif;
+   .ff-button {
+     padding: 0.55rem 1rem;
+     border-radius: 0.9rem;
+     border: 1px solid var(--ff-accent);
+     background: var(--ff-accent-soft);
+     color: var(--ff-accent);
+     font-size: 0.9rem;
+     font-weight: 500;
+     cursor: pointer;
+     box-shadow: var(--ff-shadow-soft);
+     transition: background 0.12s ease, transform 0.08s ease, color 0.12s ease;
    }
    
-   .ff-input:focus {
-     outline: none;
-     border-color: var(--ff-accent);
-     box-shadow: 0 0 0 1px rgba(210, 180, 140, 0.5);
+   .ff-button:hover {
+     color: rgba(255, 255, 255, 0.7);
    }
    
-   .ff-textarea {
-     width: 100%;
-     padding: 0.55rem 0.85rem;
-     border-radius: 0.75rem;
-     border: 1px solid var(--ff-border);
-     background: var(--ff-bg-soft);
-     color: var(--ff-text);
-     min-height: 10rem;
-     resize: vertical;
-     font-family: "Noto Sans", sans-serif;
+   .ff-button:active {
+     transform: translateY(1px);
    }
    
-   .ff-textarea:focus {
-     outline: none;
-     border-color: var(--ff-accent);
-     box-shadow: 0 0 0 1px rgba(210, 180, 140, 0.5);
+   .ff-button[disabled] {
+     opacity: 0.55;
+     cursor: default;
+     box-shadow: none;
    }
    
-  /* Base button */
-.ff-button {
-  display: inline-block;
-  padding: 0.7rem 1.4rem;
-  border-radius: 0.9rem;
-  border: 1px solid var(--ff-accent);
-  background: var(--ff-accent-soft);
-  color: var(--ff-accent);
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: var(--ff-shadow-soft);
-  transition:
-    background 0.12s ease,
-    transform 0.08s ease,
-    color 0.12s ease,
-    border-color 0.12s ease;
-}
-
-.ff-button:hover {
-  background: var(--ff-accent);
-  color: white;
-}
-
-.ff-button:active {
-  transform: translateY(1px);
-}
-
-.ff-button[disabled] {
-  opacity: 0.55;
-  cursor: default;
-  box-shadow: none;
-}
-
-/* Primary CTA version (used for Home Screen “Get Started”) */
-.ff-btn-primary {
-  display: inline-block;
-  padding: 0.8rem 1.6rem;
-  border-radius: 1rem;
-  background: var(--ff-accent);
-  border: 1px solid var(--ff-accent);
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: var(--ff-shadow-soft);
-  transition:
-    background 0.15s ease,
-    transform 0.08s ease,
-    color 0.15s ease;
-}
-
-.ff-btn-primary:hover {
-  background: var(--ff-accent-strong);
-}
-
-.ff-btn-primary:active {
-  transform: translateY(1px);
-}
-
-.ff-btn-primary[disabled] {
-  opacity: 0.6;
-  cursor: default;
-  box-shadow: none;
-}
-
-
-/* Select element remains unchanged */
-.ff-select {
-  margin-left: auto;
-  padding: 0.35rem 0.7rem;
-  border-radius: 0.6rem;
-  border: 1px solid var(--ff-border);
-  background: var(--ff-surface-soft);
-  color: var(--ff-text);
-  font-size: 0.85rem;
-}
-
+   .ff-icon-button {
+     border: none;
+     background: transparent;
+     color: inherit;
+     cursor: pointer;
+     font-size: 1.1rem;
+     padding: 0 0 0 0.3rem;
+   }
+   
+   /* Badges
+      ------------------------------------------------------------------ */
+   .ff-badge {
+     display: inline-flex;
+     align-items: center;
+     padding: 0.15rem 0.55rem;
+     border-radius: var(--ff-radius-pill);
+     font-size: 0.75rem;
+     border: 1px solid rgba(255, 255, 255, 0.08);
+     background: rgba(255, 255, 255, 0.03);
+   }
+   
+   .ff-badge-label {
+     opacity: 0.85;
+   }
    
    /* Forms
       ------------------------------------------------------------------ */
-   .ff-form-vertical {
+   .ff-input {
+     width: 100%;
+     padding: 0.55rem 0.7rem;
+     border-radius: 0.75rem;
+     border: 1px solid rgba(255, 255, 255, 0.15);
+     background: rgba(0, 0, 0, 0.18);
+     color: var(--ff-text);
+     font-size: 0.9rem;
+   }
+   
+   .ff-input::placeholder {
+     color: rgba(255, 255, 255, 0.4);
+   }
+   
+   /* Error banner
+      ------------------------------------------------------------------ */
+   .ff-error-banner {
+     margin-top: 0.9rem;
+     padding: 0.6rem 0.75rem;
+     border-radius: 0.75rem;
+     border: 1px solid rgba(255, 75, 75, 0.6);
+     background: rgba(86, 21, 21, 0.7);
+     color: #ffecec;
+   
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     gap: 0.75rem;
+   }
+   
+   /* Eisenhower grid
+      ------------------------------------------------------------------ */
+   .eisenhower-grid {
+     display: grid;
+     grid-template-columns: repeat(2, minmax(0, 1fr));
+     gap: 1.1rem;
+     margin-top: 1.3rem;
+   }
+   
+   .eisenhower-column {
      display: flex;
      flex-direction: column;
      gap: 0.75rem;
    }
    
-
-   .minddump-duplicate-warning {
-    font-size: 0.8rem;
-    opacity: 0.8;
-  }
-  
-
-  /* Onboarding shell layout
-   ------------------------------------------------------------------ */
-
-.onboarding-shell {
-  padding-top: 1.25rem;
-}
-
-/* Header with step label + progress bar */
-.onboarding-shell-header {
-  padding: 0.75rem 0 0.5rem;
-}
-
-.onboarding-shell-header .ff-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.onboarding-shell-step-meta {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-}
-
-.onboarding-shell-step-count {
-  color: var(--ff-muted);
-}
-
-.onboarding-shell-step-label {
-  font-weight: 600;
-}
-
-/* Progress bar */
-.onboarding-shell-progress-bar {
-  position: relative;
-  width: 100%;
-  height: 0.35rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-}
-
-.onboarding-shell-progress-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: var(--ff-accent);
-  box-shadow: 0 0 12px rgba(210, 180, 140, 0.7);
-  transition: width 0.2s ease-out;
-}
-
-/* Body + footer spacing */
-.onboarding-shell-body {
-  padding-top: 0.5rem;
-  padding-bottom: 1.75rem;
-}
-
-.onboarding-shell-footer {
-  padding-bottom: 2.5rem;
-}
-
-.onboarding-shell-footer .ff-container {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.onboarding-exit-button {
-  background: transparent;
-  border: none;
-  color: var(--ff-muted);
-  font-size: 0.9rem;
-  cursor: pointer;
-  padding: 0.35rem 0.75rem;
-  border-radius: 8px;
-  transition: color 0.12s ease, background 0.12s ease;
-}
-
-.onboarding-exit-button:hover {
-  color: var(--ff-text);
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.onboarding-exit-button:active {
-  transform: translateY(1px);
-}
-.onboarding-shell-top-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
+   .eisenhower-column-header {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     font-size: 0.8rem;
+     text-transform: uppercase;
+     letter-spacing: 0.08em;
+     color: var(--ff-muted);
+   }
+   
+   .eisenhower-column-body {
+     min-height: 80px;
+     padding: 0.75rem;
+     border-radius: 0.9rem;
+     border: 1px dashed rgba(255, 255, 255, 0.1);
+     background: rgba(0, 0, 0, 0.15);
+   }
+   
+   /* Onboarding shell
+      ------------------------------------------------------------------ */
+   .onboarding-shell {
+     min-height: 100vh;
+     display: flex;
+     flex-direction: column;
+   }
+   
+   .onboarding-shell-header {
+     position: sticky;
+     top: 0;
+     z-index: 20;
+     backdrop-filter: blur(14px);
+     -webkit-backdrop-filter: blur(14px);
+     background: radial-gradient(
+       circle at top center,
+       rgba(255, 255, 255, 0.16) 0%,
+       rgba(4, 5, 8, 0.96) 35%,
+       rgba(4, 5, 8, 0.98) 100%
+     );
+     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+     padding: 0.85rem 0;
+   }
+   
+   .onboarding-shell-top-row {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     gap: 1.25rem;
+   }
+   
+   .onboarding-shell-step-meta {
+     display: flex;
+     flex-direction: column;
+     gap: 0.15rem;
+   }
+   
+   .onboarding-shell-step-count {
+     font-size: 0.78rem;
+     letter-spacing: 0.12em;
+     text-transform: uppercase;
+     color: rgba(255, 255, 255, 0.65);
+   }
+   
+   .onboarding-shell-step-label {
+     font-family: "Domine", serif;
+     font-size: 1.05rem;
+     font-weight: 600;
+   }
+   
+   .onboarding-exit-button {
+     border-radius: 999px;
+     padding: 0.35rem 0.85rem;
+     border: 1px solid rgba(255, 255, 255, 0.18);
+     background: rgba(255, 255, 255, 0.05);
+     color: rgba(255, 255, 255, 0.9);
+     font-size: 0.8rem;
+     cursor: pointer;
+   }
+   
+   .onboarding-shell-progress-bar {
+     width: 100%;
+     height: 3px;
+     border-radius: 999px;
+     background: rgba(255, 255, 255, 0.08);
+     overflow: hidden;
+     margin-top: 0.6rem;
+   }
+   
+   .onboarding-shell-progress-fill {
+     height: 100%;
+     border-radius: inherit;
+     background: linear-gradient(
+       90deg,
+       rgba(210, 180, 140, 0.85),
+       rgba(210, 180, 140, 0.35)
+     );
+     transition: width 0.25s ease-out;
+   }
+   
+   .onboarding-shell-body {
+     flex: 1;
+     padding: 2.5rem 0 2rem;
+   }
+   
+   .onboarding-shell-footer {
+     padding: 0 0 2.3rem;
+   }
+   
+   /* Plan layout
+      ------------------------------------------------------------------ */
+   
+   .ff-plan-layout {
+     display: grid;
+     grid-template-columns: minmax(260px, 320px) minmax(0, 1.6fr);
+     gap: 1.75rem;
+     margin-top: 1.75rem;
+   }
+   
+   .ff-plan-sidebar {
+     border-radius: 1rem;
+     padding: 1rem;
+     background: rgba(255, 255, 255, 0.02);
+     box-shadow: var(--ff-shadow-soft);
+   }
+   
+   .ff-plan-sidebar-inner h2 {
+     margin-bottom: 0.4rem;
+   }
+   
+   /* Planner main area */
+   
+   .ff-plan-main {
+     border-radius: 1rem;
+     padding: 1.25rem;
+     background: rgba(255, 255, 255, 0.02);
+     box-shadow: var(--ff-shadow-soft);
+     display: flex;
+     flex-direction: column;
+     gap: 0.75rem;
+   }
+   
+   /* Centered calendar header */
+   
+   .ff-plan-toolbar {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     text-align: center;
+     gap: 0.75rem;
+     margin-bottom: 0.75rem;
+   }
+   
+   .ff-plan-week-label-row {
+     width: 100%;
+     display: flex;
+     justify-content: center;
+   }
+   
+   .ff-plan-week-label {
+     font-size: 1.1rem;
+     font-weight: 600;
+     opacity: 0.95;
+   }
+   
+   .ff-plan-toolbar-row {
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     gap: 0.75rem;
+     flex-wrap: wrap;
+     width: 100%;
+   }
+   
+   .ff-plan-toolbar-row--controls {
+     display: flex;
+     justify-content: center;
+     gap: 1rem;
+     width: 100%;
+   }
+   
+   .ff-plan-control {
+     display: flex;
+     align-items: center;
+     gap: 0.25rem;
+     font-size: 0.85rem;
+   }
+   
+   .ff-plan-control select {
+     font-size: 0.85rem;
+     padding: 0.1rem 0.35rem;
+     border-radius: 0.5rem;
+     border: 1px solid rgba(255, 255, 255, 0.08);
+     background: rgba(0, 0, 0, 0.12);
+     color: inherit;
+   }
+   
+   /* Week grid */
+   
+   .ff-plan-week-grid {
+     display: flex;
+     flex-direction: column;
+     gap: 0.35rem;
+     overflow: hidden;
+   }
+   
+   .ff-plan-week-header-row {
+     display: grid;
+     grid-template-columns: 60px repeat(7, minmax(0, 1fr));
+     font-size: 0.8rem;
+     opacity: 0.85;
+   }
+   
+   .ff-plan-time-gutter {
+     font-size: 0.75rem;
+     opacity: 0.7;
+   }
+   
+   .ff-plan-day-header {
+     text-align: center;
+   }
+   
+   .ff-plan-day-name {
+     font-weight: 600;
+   }
+   
+   .ff-plan-day-date {
+     opacity: 0.8;
+     font-size: 0.75rem;
+   }
+   
+   .ff-plan-week-body {
+     display: grid;
+     grid-template-columns: 60px repeat(7, minmax(0, 1fr));
+     gap: 0.3rem;
+     max-height: 640px; /* taller view */
+     overflow: auto;
+   }
+   
+   /* Today body (single-day layout) */
+   .ff-plan-week-body--today {
+     grid-template-columns: 60px minmax(0, 1fr);
+     max-height: 640px;
+   }
+   
+   .ff-plan-time-label {
+     height: calc(640px / 7); /* aligned with taller grid */
+     display: flex;
+     align-items: flex-start;
+     justify-content: flex-end;
+     padding-right: 0.25rem;
+   }
+   
+   /* Day columns */
+   
+   .ff-plan-day-column {
+     position: relative;
+     background: rgba(255, 255, 255, 0.02);
+     border-radius: 0.75rem;
+     overflow: hidden;
+   }
+   
+   .ff-plan-day-slots {
+     position: relative;
+   }
+   
+   .ff-plan-slot {
+     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+     height: 24px;
+     cursor: copy;
+   }
+   
+   .ff-plan-slot:hover {
+     background: rgba(255, 255, 255, 0.04);
+   }
+   
+   /* Blocks */
+   
+   .ff-plan-day-block-layer {
+     position: absolute;
+     inset: 0;
+     pointer-events: none;
+   }
+   
+   .ff-plan-block {
+     position: absolute;
+     left: 6px;
+     right: 6px;
+     padding: 0.25rem 0.45rem;
+     border-radius: 0.55rem;
+     border: 1px solid rgba(105, 53, 244, 0.65);
+     background: rgba(105, 53, 244, 0.16);
+     font-size: 0.78rem;
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     gap: 0.25rem;
+     pointer-events: auto;
+     cursor: grab;
+   }
+   
+   .ff-plan-block:active {
+     cursor: grabbing;
+   }
+   
+   .ff-plan-block-title {
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+   }
+   
+   .ff-plan-block-badge {
+     font-size: 0.65rem;
+     text-transform: uppercase;
+     opacity: 0.85;
+   }
+   
+   /* Month view */
+   
+   .ff-plan-month-hint {
+     margin-top: 0.5rem;
+   }
+   
+   .ff-plan-month-grid {
+     display: grid;
+     grid-template-columns: repeat(7, minmax(0, 1fr));
+     gap: 0.5rem;
+     margin-top: 0.5rem;
+   }
+   
+   .ff-plan-month-day-cell {
+     border-radius: 0.75rem;
+     padding: 0.5rem;
+     background: rgba(255, 255, 255, 0.02);
+   }
+   
+   .ff-plan-month-day-label {
+     font-size: 0.75rem;
+     opacity: 0.8;
+   }
+   
+   .ff-plan-month-day-count {
+     margin-top: 0.15rem;
+     font-size: 0.8rem;
+   }
+   

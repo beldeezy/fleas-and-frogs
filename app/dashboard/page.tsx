@@ -54,31 +54,27 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* PLAN COLUMN */}
-      <div className="ff-card">
-        <h2>Plan</h2>
-        {!hydrated && <p className="ff-hint">Loading your data…</p>}
-
-        {hydrated && (
-          <p className="ff-muted" style={{ marginTop: "0.75rem" }}>
-            This is where your planner and calendar will live — blocking time
-            for frogs and batching fleas into focused sessions.
+      {/* Plan column */}
+      <div className="ff-dashboard-column">
+          <h2>Plan</h2>
+          <p className="ff-muted">
+            Time-block your week with your key tasks.
           </p>
-        )}
-      </div>
+          <Link href="/plan" className="ff-button">
+            Go Plan
+          </Link>
+        </div>
 
-      {/* DO COLUMN */}
-      <div className="ff-card">
-        <h2>Do</h2>
-        {!hydrated && <p className="ff-hint">Loading your data…</p>}
-
-        {hydrated && (
-          <p className="ff-muted" style={{ marginTop: "0.75rem" }}>
-            This will become your focus view for “Now” tasks — the important and
-            urgent work you&apos;ve committed to finishing today.
+        {/* Do column */}
+        <div className="ff-dashboard-column">
+          <h2>Do</h2>
+          <p className="ff-muted">
+            Focus on one block at a time.
           </p>
-        )}
-      </div>
+          <Link href="/do" className="ff-button">
+            Go Do
+          </Link>
+        </div>
     </DashboardShell>
   );
 }
