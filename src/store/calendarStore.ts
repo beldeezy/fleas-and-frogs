@@ -96,19 +96,18 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
   async addBlock(input) {
     const prevBlocks = get().blocks ?? [];
     set({ isLoading: true, error: null });
-
+  
     try {
+      console.log("[calendarStore.addBlock] input", input);
       const created = await addCalendarBlock(input);
-      if (!created) {
-        throw new Error("addBlock: repo returned no block");
-      }
-
+      if (!created) throw new Error("addBlock: repo returned no block");
+  
       set({
         blocks: [...prevBlocks, created],
         isLoading: false,
       });
     } catch (err) {
-      console.error("addBlock failed", err);
+      console.error("[calendarStore.addBlock] failed", err);
       set({
         blocks: prevBlocks,
         isLoading: false,
@@ -117,32 +116,34 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
       });
     }
   },
-
+  
   async updateBlock(id, patch) {
     const prevBlocks = get().blocks ?? [];
     if (!prevBlocks.length) {
       console.warn("updateBlock: no blocks in store");
       return;
     }
-
+  
     const existing = prevBlocks.find((b) => b.id === id);
     if (!existing) {
       console.warn("updateBlock: no block with id", id);
       return;
     }
-
+  
     const localUpdated: CalendarBlock = {
       ...existing,
       ...patch,
       updatedAt: new Date().toISOString(),
     };
-
+  
     const optimistic = prevBlocks.map((b) =>
       b.id === id ? localUpdated : b
     );
-
+  
+    console.log("[calendarStore.updateBlock] optimistic", localUpdated);
+  
     set({ blocks: optimistic, isLoading: true, error: null });
-
+  
     try {
       const saved: CalendarBlock = await repoUpdateCalendarBlock(localUpdated);
       set((state) => ({
@@ -150,7 +151,7 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
         isLoading: false,
       }));
     } catch (err) {
-      console.error("updateBlock failed; rolling back", err);
+      console.error("[calendarStore.updateBlock] failed; rolling back", err);
       set({
         blocks: prevBlocks,
         isLoading: false,
@@ -159,6 +160,7 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
       });
     }
   },
+  
 
   async deleteBlock(id) {
     const prevBlocks = get().blocks ?? [];

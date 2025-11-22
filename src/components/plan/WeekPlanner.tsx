@@ -1,7 +1,7 @@
 // src/components/plan/WeekPlanner.tsx
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import type { Task, CalendarBlock } from "../../lib/schema";
 import { useCalendarStore } from "../../store/calendarStore";
 import { ScheduleSidebar } from "../plan/ScheduleSidebar";
@@ -16,6 +16,7 @@ type ViewMode = "week" | "today" | "month";
 
 const DAY_START_HOUR = 5;
 const DAY_END_HOUR = 12; // noon
+const EXIT_ANIMATION_MS = 1600; // match your .ff-task--leaving animation duration
 
 function startOfWeek(date: Date): Date {
   const d = new Date(date);
@@ -49,13 +50,25 @@ export function WeekPlanner({ tasks, blocks }: WeekPlannerProps) {
   const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
   const [draggingBlockId, setDraggingBlockId] = useState<string | null>(null);
 
+  const [leavingTasks, setLeavingTasks] = useState<Set<string>>(new Set());
+
   const addBlock = useCalendarStore((s) => s.addBlock);
   const updateBlock = useCalendarStore((s) => s.updateBlock);
   const deleteBlock = useCalendarStore((s) => s.deleteBlock);
 
+  console.log(
+    "[WeekPlanner] render",
+    "tasks:",
+    tasks.length,
+    "blocks:",
+    blocks.length,
+    "viewMode:",
+    viewMode
+  );
+
   //
   // ---------------------------------------------------------
-  // NEW: Scheduled vs Unscheduled Task Logic
+  // Scheduled vs Unscheduled Task Logic
   // ---------------------------------------------------------
   //
 
@@ -136,7 +149,7 @@ export function WeekPlanner({ tasks, blocks }: WeekPlannerProps) {
     setDraggingTaskId(null);
   };
 
-  const handleDropTaskIntoSlot = async (
+  const handleDropTaskIntoSlot = (
     taskId: string,
     day: Date,
     startHour: number,
@@ -150,19 +163,35 @@ export function WeekPlanner({ tasks, blocks }: WeekPlannerProps) {
 
     const end = new Date(start.getTime() + slotMinutes * 60_000);
 
-    try {
-      await addBlock({
-        taskId,
-        title: task.title,
-        notes: null,
-        start: start.toISOString(),
-        end: end.toISOString(),
-        recurrence: "none",
-        color: "rgba(105,53,244,0.12)",
-      });
-    } finally {
-      setDraggingTaskId(null);
-    }
+    // Mark task as "leaving" so CSS can animate it out of the unscheduled list
+    setLeavingTasks((prev) => {
+      const next = new Set(prev);
+      next.add(taskId);
+      return next;
+    });
+
+    window.setTimeout(async () => {
+      try {
+        await addBlock({
+          taskId,
+          title: task.title,
+          notes: null,
+          start: start.toISOString(),
+          end: end.toISOString(),
+          recurrence: "none",
+          color: "rgba(105,53,244,0.12)",
+        });
+      } catch (err) {
+        console.error("Failed to add calendar block from drop", err);
+      } finally {
+        setLeavingTasks((prev) => {
+          const next = new Set(prev);
+          next.delete(taskId);
+          return next;
+        });
+        setDraggingTaskId(null);
+      }
+    }, EXIT_ANIMATION_MS);
   };
 
   const handleDropBlockIntoSlot = async (
@@ -238,11 +267,13 @@ export function WeekPlanner({ tasks, blocks }: WeekPlannerProps) {
     <div className="ff-plan-layout">
       {/* LEFT SIDEBAR */}
       <aside className="ff-plan-sidebar">
-        <ScheduleSidebar
-          unscheduled={unscheduledTasks}
-          scheduled={scheduledTasks}
-          onTaskDragStart={handleTaskDragStart}
-        />
+      <ScheduleSidebar
+        unscheduled={unscheduledTasks}
+        scheduled={scheduledTasks}
+        leavingTasks={leavingTasks}    // ← REQUIRED
+        onTaskDragStart={handleTaskDragStart}
+      />
+
       </aside>
 
       {/* RIGHT: Calendar */}

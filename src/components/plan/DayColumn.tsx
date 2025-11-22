@@ -41,26 +41,44 @@ function blockStyle(
   const start = new Date(block.start);
   const end = new Date(block.end);
 
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    console.error("[blockStyle] Invalid block dates", block);
+    // Fallback: stick it at the top with a tiny height instead of crashing layout
+    return {
+      top: "0%",
+      height: "4%",
+    };
+  }
+
+  const totalMinutes = (dayEndHour - dayStartHour) * 60;
+  if (totalMinutes <= 0) {
+    console.error("[blockStyle] Invalid day range", {
+      dayStartHour,
+      dayEndHour,
+    });
+    return {
+      top: "0%",
+      height: "4%",
+    };
+  }
+
   const startMinutes =
     (start.getHours() - dayStartHour) * 60 + start.getMinutes();
   const endMinutes =
     (end.getHours() - dayStartHour) * 60 + end.getMinutes();
 
-  const totalMinutes = (dayEndHour - dayStartHour) * 60;
+  const topPct = Math.max(0, (startMinutes / totalMinutes) * 100);
+  const endPct = (endMinutes / totalMinutes) * 100;
 
-  const top = Math.max(0, (startMinutes / totalMinutes) * 100);
-  const bottom = Math.max(
-    top + 4, // minimum height
-    (endMinutes / totalMinutes) * 100
-  );
-
-  const height = bottom - top;
+  const bottomPct = Math.max(topPct + 4, endPct);
+  const heightPct = bottomPct - topPct;
 
   return {
-    top: `${top}%`,
-    height: `${height}%`,
+    top: `${topPct}%`,
+    height: `${heightPct}%`,
   };
 }
+
 
 export function DayColumn({
   date,

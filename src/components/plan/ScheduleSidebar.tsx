@@ -7,12 +7,14 @@ import { TaskCard } from "../tasks/TaskCard";
 type ScheduleSidebarProps = {
   unscheduled: Task[];
   scheduled: Task[];
+  leavingTasks: Set<string>;         // ← NEW
   onTaskDragStart: (taskId: string) => void;
 };
 
 export function ScheduleSidebar({
   unscheduled,
   scheduled,
+  leavingTasks,                       // ← NEW
   onTaskDragStart,
 }: ScheduleSidebarProps) {
   const hasAny = unscheduled.length > 0 || scheduled.length > 0;
@@ -34,11 +36,13 @@ export function ScheduleSidebar({
           <ul className="ff-task-list">
             {unscheduled.map((task) => (
               <TaskCard
-                key={task.id}
-                task={task}
-                variant="default"
-                onDragStart={onTaskDragStart}
-              />
+              key={task.id}
+              task={task}
+              isScheduled={false}
+              isLeaving={leavingTasks.has(task.id)}
+              onDragStart={onTaskDragStart}
+            />
+            
             ))}
           </ul>
         </section>
@@ -50,11 +54,13 @@ export function ScheduleSidebar({
           <ul className="ff-task-list ff-task-list--scheduled">
             {scheduled.map((task) => (
               <TaskCard
-                key={task.id}
-                task={task}
-                variant="scheduled"
-                onDragStart={onTaskDragStart}
-              />
+              key={task.id}
+              task={task}
+              isScheduled={true}
+              isLeaving={false}   // they don’t leave this section
+              onDragStart={onTaskDragStart}
+            />
+            
             ))}
           </ul>
         </section>

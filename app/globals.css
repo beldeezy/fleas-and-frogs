@@ -352,12 +352,50 @@
      flex-direction: column;
      gap: 0.8rem;
    }
+
+   /* Unscheduled task EXIT animation */
+.ff-task--leaving {
+  animation: ff-task-exit 0.8s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes ff-task-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+   /* When a task appears in the Scheduled list, fade + slide it in */
+   .ff-task-list--scheduled .ff-task {
+    animation-name: ff-scheduled-enter;
+    animation-duration: 3s; /* slower entry */
+    animation-delay: 0.5s; /* optional delay */
+    animation-fill-mode: both;
+    animation-timing-function: cubic-bezier(0.22, 0.44, 0, 1); /* soft, organic */
+    will-change: opacity, transform;
+  }
+  
+  @keyframes ff-scheduled-enter {
+    from {
+      opacity: 0;
+      transform: translateY(-10px); /* slightly more float */
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+
    
    /* Cards / tasks
       ------------------------------------------------------------------ */
-   /* ----------------------------------------------------------
-   TASK ITEM — Left-Aligned Layout (Revised)
-   ---------------------------------------------------------- */
+   
 
 .ff-task {
   display: flex;
