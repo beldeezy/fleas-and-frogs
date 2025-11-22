@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState, type MouseEvent, DragEvent } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTaskStore } from "../../src/store/taskStore";
 import { usePriorityStore } from "../../src/store/priorityStore";
+import { LifePriorityList } from "../../src/components/prioritize/LifePriorityList";
 
 export default function PrioritizePage() {
   const router = useRouter();
@@ -21,18 +22,11 @@ export default function PrioritizePage() {
   const priorities = usePriorityStore((state) => state.priorities);
   const prioritiesHydrated = usePriorityStore((state) => state.hydrated);
   const loadPriorities = usePriorityStore((state) => state.loadPriorities);
-  const addPriority = usePriorityStore((state) => state.addPriority);
-  const deletePriority = usePriorityStore((state) => state.deletePriority);
-  const reorderPriorities = usePriorityStore(
-    (state) => state.reorderPriorities
-  );
 
   const hydrated = tasksHydrated && prioritiesHydrated;
 
   // ---- Local UI state ----
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-  const [newPriorityName, setNewPriorityName] = useState("");
-  const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [prioritiesConfirmed, setPrioritiesConfirmed] = useState(false);
 
   useEffect(() => {
@@ -55,46 +49,6 @@ export default function PrioritizePage() {
       return ao - bo;
     });
 
-  // ---- Priority handlers ----
-  const handleAddPriority = async (e?: MouseEvent<HTMLButtonElement>) => {
-    e?.preventDefault();
-    const name = newPriorityName.trim();
-    if (!name) return;
-
-    await addPriority(name);
-    setNewPriorityName("");
-  };
-
-  const handleDeletePriorityClick = async (id: string) => {
-    await deletePriority(id);
-  };
-
-  const handleDragStart = (index: number) => {
-    setDragIndex(index);
-  };
-
-  const handleDragOver = (e: DragEvent<HTMLLIElement>, index: number) => {
-    e.preventDefault();
-    if (dragIndex === null || dragIndex === index) return;
-
-    const updated = [...priorities];
-    const [moved] = updated.splice(dragIndex, 1);
-    updated.splice(index, 0, moved);
-
-    const withOrder = updated.map((p, idx) => ({
-      ...p,
-      order: idx,
-    }));
-
-    reorderPriorities(withOrder);
-    setDragIndex(index);
-  };
-
-  const handleDragEnd = () => {
-    setDragIndex(null);
-  };
-
-  // ---- Task priority handlers ----
   const handleSelectTask = (taskId: string) => {
     setSelectedTaskId(taskId);
   };
@@ -108,9 +62,7 @@ export default function PrioritizePage() {
     }
   };
 
-  // ---- Confirm priorities -> go to Strategize ----
   const handleConfirmPriorities = () => {
-    // Require: at least one task, at least one priority, and no unassigned tasks
     if (!tasks.length || !priorities.length || unprioritizedTasks.length > 0) {
       return;
     }
@@ -134,16 +86,12 @@ export default function PrioritizePage() {
         spending effort where it matters most.
       </p>
 
-      {/* Global loading + updating hints */}
       {!hydrated && (
         <p className="ff-hint">Loading your tasks and priorities…</p>
       )}
 
-      {hydrated && isLoading && (
-        <p className="ff-hint">Updating tasks…</p>
-      )}
+      {hydrated && isLoading && <p className="ff-hint">Updating tasks…</p>}
 
-      {/* Error banner */}
       {error && (
         <div className="ff-error-banner">
           <span>{error}</span>
@@ -160,88 +108,18 @@ export default function PrioritizePage() {
 
       {hydrated && (
         <>
-          {/* -------------------- Life Priorities (rank + delete) -------------------- */}
+          {/* Life Priorities */}
           <section className="ff-section">
             <h2>Life Priorities</h2>
             <p className="ff-hint">
-              Create your core priorities, then drag to rank them. Higher on
-              the list = more important.
+              Create your core priorities, then drag to rank them. Higher on the
+              list = more important.
             </p>
 
-            {/* Full-width input row styled like a task bar */}
-            <div className="ff-task ff-task-input-row">
-              <div className="ff-task-main">
-                <input
-                  type="text"
-                  className="ff-input ff-input-grow"
-                  placeholder="Add a Life Priority (e.g., Faith, Family, Craft)"
-                  value={newPriorityName}
-                  onChange={(e) => setNewPriorityName(e.target.value)}
-                />
-              </div>
-              <div className="ff-task-controls">
-                <button
-                  type="button"
-                  className="ff-button ff-button-sm"
-                  onClick={handleAddPriority}
-                >
-                  Add
-                </button>
-              </div>
-            </div>
-
-            {/* Draggable priority list */}
-            <ul className="ff-task-list ff-priority-list">
-              {priorities.map((priority, index) => (
-                <li
-                  key={priority.id}
-                  className={`ff-task ff-priority ${
-                    dragIndex === index ? "ff-priority--dragging" : ""
-                  }`}
-                  draggable
-                  onDragStart={() => handleDragStart(index)}
-                  onDragOver={(e) => handleDragOver(e, index)}
-                  onDragEnd={handleDragEnd}
-                >
-                  <div className="ff-task-main">
-                    <span className="ff-drag-handle" aria-hidden="true">
-                      ⋮⋮
-                    </span>
-                    <span className="ff-pill ff-pill-rank">
-                      {index + 1}.
-                    </span>
-                    <span className="ff-priority-name">
-                      {priority.name}
-                    </span>
-                  </div>
-
-                  <div className="ff-task-controls">
-                    <button
-                      type="button"
-                      className="ff-icon-button"
-                      aria-label={`Delete priority ${priority.name}`}
-                      onClick={() =>
-                        handleDeletePriorityClick(priority.id)
-                      }
-                    >
-                      🗑
-                    </button>
-                  </div>
-                </li>
-              ))}
-
-              {priorities.length === 0 && (
-                <li className="ff-task ff-empty">
-                  <span className="ff-hint">
-                    No Life Priorities yet. Add at least one to start
-                    shaping where you want your time to go.
-                  </span>
-                </li>
-              )}
-            </ul>
+            <LifePriorityList priorities={priorities} />
           </section>
 
-          {/* -------------------- Unprioritized tasks -------------------- */}
+          {/* Unprioritized tasks */}
           <section className="ff-section">
             <h2>Unprioritized tasks</h2>
             <p className="ff-hint">
@@ -254,14 +132,12 @@ export default function PrioritizePage() {
                 <li
                   key={task.id}
                   className={`ff-task ${
-                    selectedTaskId === task.id
-                      ? "ff-task--selected"
-                      : ""
+                    selectedTaskId === task.id ? "ff-task--selected" : ""
                   }`}
                   onClick={() => handleSelectTask(task.id)}
                 >
                   <div className="ff-task-main">
-                    <span>{task.title}</span>
+                    <span className="ff-task-title">{task.title}</span>
                   </div>
 
                   <div className="ff-task-controls">
@@ -269,10 +145,7 @@ export default function PrioritizePage() {
                       className="ff-select"
                       value={task.priorityId ?? ""}
                       onChange={(e) =>
-                        handleChangeTaskPriority(
-                          task.id,
-                          e.target.value
-                        )
+                        handleChangeTaskPriority(task.id, e.target.value)
                       }
                     >
                       <option value="">Unassigned</option>
@@ -295,8 +168,7 @@ export default function PrioritizePage() {
               {unprioritizedTasks.length === 0 && tasks.length > 0 && (
                 <li className="ff-task ff-empty">
                   <span className="ff-hint">
-                    You&apos;ve already assigned all tasks to Life
-                    Priorities.
+                    You&apos;ve already assigned all tasks to Life Priorities.
                   </span>
                 </li>
               )}
@@ -311,19 +183,19 @@ export default function PrioritizePage() {
             </ul>
           </section>
 
-          {/* -------------------- Prioritized tasks -------------------- */}
+          {/* Prioritized tasks */}
           <section className="ff-section">
             <h2>Prioritized tasks</h2>
             <p className="ff-hint">
-              These tasks already belong to a Life Priority. Use this list
-              as a quick overview of where your energy is going.
+              These tasks already belong to a Life Priority. Use this list as a
+              quick overview of where your energy is going.
             </p>
 
             <ul className="ff-task-list">
               {prioritizedTasks.map(({ task }) => (
                 <li key={task.id} className="ff-task">
                   <div className="ff-task-main">
-                    <span>{task.title}</span>
+                    <span className="ff-task-title">{task.title}</span>
                   </div>
 
                   <div className="ff-task-controls">
@@ -331,10 +203,7 @@ export default function PrioritizePage() {
                       className="ff-select"
                       value={task.priorityId ?? ""}
                       onChange={(e) =>
-                        handleChangeTaskPriority(
-                          task.id,
-                          e.target.value
-                        )
+                        handleChangeTaskPriority(task.id, e.target.value)
                       }
                     >
                       <option value="">Unassigned</option>
@@ -357,15 +226,15 @@ export default function PrioritizePage() {
               {prioritizedTasks.length === 0 && (
                 <li className="ff-task ff-empty">
                   <span className="ff-hint">
-                    Once you assign priorities to tasks above, they&apos;ll
-                    show up here.
+                    Once you assign priorities to tasks above, they&apos;ll show
+                    up here.
                   </span>
                 </li>
               )}
             </ul>
           </section>
 
-          {/* -------------------- Confirm priorities -> Strategize -------------------- */}
+          {/* Confirm */}
           <section className="ff-section">
             <button
               type="button"
