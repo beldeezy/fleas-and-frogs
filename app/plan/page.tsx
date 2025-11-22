@@ -6,6 +6,7 @@ import { useTaskStore } from "../../src/store/taskStore";
 import { useCalendarStore } from "../../src/store/calendarStore";
 import { DndProvider } from "../../src/components/dnd/DndProvider";
 import { WeekPlanner } from "../../src/components/plan/WeekPlanner";
+import { PlanErrorBoundary } from "../../src/components/plan/PlanErrorBoundary";
 
 export default function PlanPage() {
   // ---- Tasks ----
@@ -81,7 +82,9 @@ export default function PlanPage() {
 
       {hydrated && (
         <DndProvider>
-          <WeekPlanner tasks={safeTasks} blocks={safeBlocks} />
+          <PlanErrorBoundary>
+            <WeekPlanner tasks={safeTasks} blocks={safeBlocks} />
+          </PlanErrorBoundary>
         </DndProvider>
       )}
     </main>

@@ -1,6 +1,7 @@
 // src/components/plan/DayColumn.tsx
 "use client";
 
+import React from "react";
 import type { CalendarBlock } from "../../lib/schema";
 
 type DayColumnProps = {
@@ -37,7 +38,6 @@ function blockStyle(
   dayStartHour: number,
   dayEndHour: number
 ) {
-  // naive positioning: assume entire day height = 100%, map time range to that
   const start = new Date(block.start);
   const end = new Date(block.end);
 
@@ -50,7 +50,7 @@ function blockStyle(
 
   const top = Math.max(0, (startMinutes / totalMinutes) * 100);
   const bottom = Math.max(
-    top + 4, // min height
+    top + 4, // minimum height
     (endMinutes / totalMinutes) * 100
   );
 
@@ -129,11 +129,7 @@ export function DayColumn({
       {/* Overlay: blocks */}
       <div className="ff-plan-day-block-layer">
         {blocks.map((block) => {
-          const position = blockStyle(
-            block,
-            dayStartHour,
-            dayEndHour
-          );
+          const position = blockStyle(block, dayStartHour, dayEndHour);
 
           return (
             <button
@@ -145,9 +141,7 @@ export function DayColumn({
               onDragStart={() => onBlockDragStart(block.id)}
               onClick={() => onEditBlock(block)}
             >
-              <span className="ff-plan-block-title">
-                {block.title}
-              </span>
+              <span className="ff-plan-block-title">{block.title}</span>
               {block.recurrence && block.recurrence !== "none" && (
                 <span className="ff-plan-block-badge">
                   {block.recurrence}

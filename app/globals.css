@@ -83,6 +83,180 @@
      z-index: 10;
    }
    
+   /* Hamburger + drawer
+   ------------------------------------------------------------------ */
+
+.ff-header-left {
+  display: flex;
+  align-items: center;
+}
+
+.ff-header-logo {
+  font-family: var(--ff-font-heading, "Domine", serif);
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+/* Revised hamburger button hit area */
+.ff-menu-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0.35rem 0.45rem;      /* bigger clickable area */
+  border-radius: 999px;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: radial-gradient(
+      circle at 10% 0%,
+      rgba(255, 255, 255, 0.04),
+      transparent
+    ),
+    rgba(7, 8, 14, 0.9);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+}
+
+.ff-menu-line {
+  position: absolute;
+  width: 1.1rem;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  transition:
+    transform 0.16s ease,
+    opacity 0.16s ease;
+}
+
+/* Three-bar layout */
+.ff-menu-line:nth-of-type(1) {
+  transform: translateY(-5px);
+}
+
+.ff-menu-line:nth-of-type(2) {
+  transform: translateY(0);
+}
+
+.ff-menu-line:nth-of-type(3) {
+  transform: translateY(5px);
+}
+
+/* X state */
+.ff-menu-button--open .ff-menu-line:nth-of-type(1) {
+  transform: rotate(45deg);
+}
+
+.ff-menu-button--open .ff-menu-line:nth-of-type(2) {
+  opacity: 0;
+}
+
+.ff-menu-button--open .ff-menu-line:nth-of-type(3) {
+  transform: rotate(-45deg);
+}
+
+/* Backdrop behind drawer */
+.ff-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.8));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+  z-index: 40;
+}
+
+.ff-nav-backdrop--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Drawer (Moleskine-style matte panel) */
+.ff-nav-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(260px, 80vw);
+  height: 100vh;
+  padding: 1.2rem 1.4rem;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.35)),
+    radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.03), transparent 55%),
+    #111119;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: -18px 0 45px rgba(0, 0, 0, 0.75);
+  transform: translateX(100%);
+  transition: transform 0.2s ease-out;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ff-nav-drawer--open {
+  transform: translateX(0%);
+}
+
+/* Drawer header */
+.ff-nav-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.ff-nav-drawer-title {
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ff-nav-drawer-close {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+/* Drawer links */
+.ff-nav-drawer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.ff-nav-drawer-link {
+  display: block;
+  padding: 0.75rem 0.6rem;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  background: transparent;
+  border: 1px solid transparent;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.08s ease;
+}
+
+.ff-nav-drawer-link:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateX(-1px);
+}
+
+.ff-nav-drawer-link--active {
+  background: rgba(105, 53, 244, 0.15);
+  border-color: rgba(105, 53, 244, 0.7);
+}
+
    .ff-logo {
      font-family: "Domine", serif;
      font-weight: 700;
@@ -181,55 +355,111 @@
    
    /* Cards / tasks
       ------------------------------------------------------------------ */
-   .ff-task {
-     display: flex;
-     align-items: center;
-     justify-content: space-between;
-     gap: 0.9rem;
-     padding: 0.9rem 1.05rem;
-   
-     border-radius: var(--ff-radius-card);
-     background: var(--ff-surface);
-     border: 1px solid var(--ff-border);
-     box-shadow: var(--ff-shadow-soft);
-   
-     transition: background 0.15s ease, border-color 0.15s ease;
-   }
-   
-   .ff-task:hover {
-     background: var(--ff-surface-soft);
-     border-color: rgba(210, 180, 140, 0.25);
-   }
-   
-   .ff-task-main {
-     display: flex;
-     flex-direction: column;
-     gap: 0.25rem;
-     min-width: 0;
-   }
-   
-   .ff-task-title {
-     font-size: 0.95rem;
-     font-weight: 500;
-     color: var(--ff-text);
-     word-break: break-word;
-   }
-   
-   .ff-task-meta {
-     display: flex;
-     flex-wrap: wrap;
-     gap: 0.3rem 0.75rem;
-     font-size: 0.8rem;
-     color: var(--ff-muted);
-   }
-   
-   .ff-task-actions {
-     display: flex;
-     flex-direction: column;
-     align-items: flex-end;
-     gap: 0.35rem;
-   }
-   
+   /* ----------------------------------------------------------
+   TASK ITEM — Left-Aligned Layout (Revised)
+   ---------------------------------------------------------- */
+
+.ff-task {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;    /* ⬅ Instead of space-between */
+  gap: 0.9rem;
+  padding: 0.9rem 1.05rem;
+
+  border-radius: var(--ff-radius-card);
+  background: var(--ff-surface);
+  border: 1px solid var(--ff-border);
+  box-shadow: var(--ff-shadow-soft);
+
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.ff-task:hover {
+  background: var(--ff-surface-soft);
+  border-color: rgba(210, 180, 140, 0.25);
+}
+
+/* Bullet / check container */
+.ff-task-leading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;                 /* ⬅ Prevents collapsing */
+  margin-right: 0.2rem;
+}
+
+/* Main text column */
+.ff-task-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  flex: 1;                        /* ⬅ Ensures left alignment + fills space */
+  text-align: left;               /* ⬅ Fix for titles not left-aligned */
+}
+
+/* Title text */
+.ff-task-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ff-text);
+  word-break: break-word;
+}
+
+/* Metadata (unused but kept) */
+.ff-task-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--ff-muted);
+}
+
+/* Right-side actions (kept intact) */
+.ff-task-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+/* Bullet + Checkmark visuals */
+.ff-task-bullet {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.ff-task-check {
+  font-size: 0.9rem;
+  line-height: 1;
+  transform: translateY(1px);
+}
+
+/* Scheduled style */
+.ff-task--scheduled {
+  opacity: 0.85;
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+  
+  /* Divider between sections */
+  .ff-plan-sidebar-section {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed rgba(255, 255, 255, 0.15);
+  }
+  
+  .ff-plan-sidebar-section-title {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+    color: var(--ff-muted);
+  }
+  
    /* Buttons & inputs
       ------------------------------------------------------------------ */
    .ff-button {
@@ -358,21 +588,9 @@
    }
    
    .onboarding-shell-header {
-     position: sticky;
-     top: 0;
-     z-index: 20;
-     backdrop-filter: blur(14px);
-     -webkit-backdrop-filter: blur(14px);
-     background: radial-gradient(
-       circle at top center,
-       rgba(255, 255, 255, 0.16) 0%,
-       rgba(4, 5, 8, 0.96) 35%,
-       rgba(4, 5, 8, 0.98) 100%
-     );
-     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-     padding: 0.85rem 0;
-   }
-   
+    background: transparent;
+  }
+  
    .onboarding-shell-top-row {
      display: flex;
      justify-content: space-between;
@@ -562,26 +780,26 @@
    }
    
    .ff-plan-week-body {
-     display: grid;
-     grid-template-columns: 60px repeat(7, minmax(0, 1fr));
-     gap: 0.3rem;
-     max-height: 640px; /* taller view */
-     overflow: auto;
-   }
+    display: grid;
+    grid-template-columns: 60px repeat(7, minmax(0, 1fr));
+    gap: 0.3rem;
+    /* Let the row heights be defined by the slots + time labels */
+    /* If you want scrolling later, use max-height again but keep it consistent */
+  }
+  
+  .ff-plan-week-body--today {
+    grid-template-columns: 60px minmax(0, 1fr);
+  }
+  
    
-   /* Today body (single-day layout) */
-   .ff-plan-week-body--today {
-     grid-template-columns: 60px minmax(0, 1fr);
-     max-height: 640px;
-   }
-   
-   .ff-plan-time-label {
-     height: calc(640px / 7); /* aligned with taller grid */
-     display: flex;
-     align-items: flex-start;
-     justify-content: flex-end;
-     padding-right: 0.25rem;
-   }
+  .ff-plan-time-label {
+    height: 48px; /* 2 x 24px = one hour when slotMinutes = 30 */
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding-right: 0.25rem;
+  }
+  
    
    /* Day columns */
    
@@ -606,6 +824,13 @@
      background: rgba(255, 255, 255, 0.04);
    }
    
+   /* When a dragged task is hovering this slot */
+.ff-plan-slot--hover {
+  background: rgba(255, 255, 255, 0.06);
+  outline: 1px solid rgba(255, 255, 255, 0.14);
+  outline-offset: -1px;
+}
+
    /* Blocks */
    
    .ff-plan-day-block-layer {
