@@ -9,10 +9,12 @@ export default function Header() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
+  // Hide header during onboarding
   if (pathname.startsWith("/onboarding")) {
     return null;
   }
 
+  // Drawer items only
   const navItems = [
     { href: "/mind-dump", label: "Mind Dump" },
     { href: "/prioritize", label: "Prioritize" },
@@ -26,12 +28,14 @@ export default function Header() {
 
   return (
     <header className="ff-header">
+      {/* Left: Logo only */}
       <div className="ff-header-left">
         <Link href="/" className="ff-header-logo">
           F&F
         </Link>
       </div>
 
+      {/* Right: Hamburger only */}
       <button
         type="button"
         className={`ff-menu-button ${isOpen ? "ff-menu-button--open" : ""}`}
@@ -39,25 +43,25 @@ export default function Header() {
         aria-expanded={isOpen}
         onClick={toggle}
       >
-        {/* THREE bars now */}
         <span className="ff-menu-line" />
         <span className="ff-menu-line" />
         <span className="ff-menu-line" />
       </button>
 
+      {/* Backdrop */}
       <div
-        className={`ff-nav-backdrop ${
-          isOpen ? "ff-nav-backdrop--visible" : ""
-        }`}
+        className={`ff-nav-backdrop ${isOpen ? "ff-nav-backdrop--visible" : ""}`}
         onClick={close}
       />
 
+      {/* Drawer */}
       <aside
         className={`ff-nav-drawer ${isOpen ? "ff-nav-drawer--open" : ""}`}
         aria-hidden={!isOpen}
       >
         <div className="ff-nav-drawer-header">
           <span className="ff-nav-drawer-title">Navigate</span>
+
           <button
             type="button"
             className="ff-nav-drawer-close"

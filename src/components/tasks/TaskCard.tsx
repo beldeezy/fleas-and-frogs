@@ -1,3 +1,4 @@
+// src/components/tasks/TaskCard.tsx
 "use client";
 
 import type { Task, EisenhowerValue } from "../../lib/schema";
@@ -44,7 +45,7 @@ export function TaskCard({
         {/* Optional Life Priority dropdown (by priorityId) */}
         {onPriorityChange && (
           <select
-            className="ff-task-priority-select"
+            className="ff-select ff-select--task ff-select--priority"
             value={task.priorityId ?? ""}
             onChange={(e) =>
               onPriorityChange(
@@ -54,8 +55,7 @@ export function TaskCard({
             }
           >
             <option value="">No Life Priority</option>
-            {/* You can map real priorities later */}
-            {/* These are placeholders */}
+            {/* placeholders – replace with real priorities when wired */}
             <option value="faith">Faith</option>
             <option value="family">Family</option>
             <option value="fitness">Fitness</option>
@@ -65,7 +65,7 @@ export function TaskCard({
         {/* Optional Eisenhower dropdown */}
         {onEisenhowerChange && (
           <select
-            className="ff-task-eisenhower-select"
+            className="ff-select ff-select--task ff-select--eisenhower"
             value={task.eisenhower ?? ""}
             onChange={(e) =>
               onEisenhowerChange(
@@ -75,6 +75,7 @@ export function TaskCard({
             }
           >
             <option value="">No quadrant</option>
+            {/* values here will be updated to real EisenhowerValue keys later */}
             <option value="UI">Urgent & Important</option>
             <option value="UNI">Urgent & Not Important</option>
             <option value="NUI">Not Urgent & Important</option>

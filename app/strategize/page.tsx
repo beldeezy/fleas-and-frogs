@@ -29,9 +29,10 @@ export default function StrategizePage() {
   const safePriorities = Array.isArray(priorities) ? priorities : [];
 
   useEffect(() => {
-    loadTasks();
-    loadPriorities();
-  }, [loadTasks, loadPriorities]);
+    void loadTasks();
+    void loadPriorities();
+  }, []); 
+  
 
   // breadcrumb for debugging render/hydration behavior
   console.log(

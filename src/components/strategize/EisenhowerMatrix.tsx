@@ -81,10 +81,7 @@ export function EisenhowerMatrix({
   return (
     <section className="ff-section">
       <h2>{priorityName}</h2>
-      <p className="ff-muted">
-        Sort tasks for <strong>{priorityName}</strong> using importance and
-        urgency.
-      </p>
+     
 
       {/* Eisenhower matrix grid */}
       <EisenhowerGrid
@@ -100,8 +97,7 @@ export function EisenhowerMatrix({
       >
         <h3>Unsorted tasks</h3>
         <p className="ff-hint">
-          Drag these into a quadrant above, or choose a quadrant from the
-          dropdown.
+          Drag these into a quadrant above.
         </p>
 
         <ul className="ff-task-list">

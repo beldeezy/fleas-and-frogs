@@ -65,11 +65,9 @@ export function WeekPlanner({ tasks, blocks }: WeekPlannerProps) {
     viewMode
   );
 
-  //
   // ---------------------------------------------------------
   // Scheduled vs Unscheduled Task Logic
   // ---------------------------------------------------------
-  //
 
   const scheduleCandidates = useMemo(
     () => tasks.filter((t) => t.eisenhower === "plan"),
@@ -97,9 +95,7 @@ export function WeekPlanner({ tasks, blocks }: WeekPlannerProps) {
     [scheduleCandidates, blocksByTaskId]
   );
 
-  //
   // ---------------------------------------------------------
-  //
 
   const weekDays = useMemo(
     () => Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i)),
@@ -243,22 +239,48 @@ export function WeekPlanner({ tasks, blocks }: WeekPlannerProps) {
     });
   };
 
+  // Popover edit
   const handleEditBlock = async (block: CalendarBlock) => {
-    const shouldDelete = window.confirm("Delete this block? OK = delete.");
-
-    if (shouldDelete) {
-      await deleteBlock(block.id);
-      return;
-    }
-
+    const nextTitle =
+      window.prompt("Block title:", block.title) ?? block.title;
     const nextNotes =
       window.prompt("Notes (blank to clear):", block.notes ?? "") ??
       block.notes;
 
     try {
-      await updateBlock(block.id, { notes: nextNotes || null });
+      await updateBlock(block.id, {
+        title: nextTitle || block.title,
+        notes: nextNotes || null,
+      });
     } catch (err) {
-      console.error("Update failed", err);
+      console.error("[WeekPlanner.handleEditBlock] failed", err);
+    }
+  };
+
+  // Popover delete
+  const handleDeleteBlock = async (blockId: string) => {
+    const shouldDelete = window.confirm("Delete this block?");
+    if (!shouldDelete) return;
+
+    try {
+      await deleteBlock(blockId);
+    } catch (err) {
+      console.error("[WeekPlanner.handleDeleteBlock] failed", err);
+    }
+  };
+
+  const handleResizeBlock = async (
+    blockId: string,
+    nextStartIso: string,
+    nextEndIso: string
+  ) => {
+    try {
+      await updateBlock(blockId, {
+        start: nextStartIso,
+        end: nextEndIso,
+      });
+    } catch (err) {
+      console.error("[WeekPlanner.handleResizeBlock] failed", err);
     }
   };
 
@@ -329,12 +351,15 @@ export function WeekPlanner({ tasks, blocks }: WeekPlannerProps) {
 
         {viewMode === "week" && (
           <div className="ff-plan-week-grid">
+            {/* Header row: time gutter + day labels */}
             <div className="ff-plan-week-header-row">
               <div className="ff-plan-time-gutter" />
               {weekDays.map((day, idx) => (
                 <div key={idx} className="ff-plan-day-header">
                   <div className="ff-plan-day-name">
-                    {day.toLocaleDateString(undefined, { weekday: "short" })}
+                    {day.toLocaleDateString(undefined, {
+                      weekday: "short",
+                    })}
                   </div>
                   <div className="ff-plan-day-date">
                     {day.toLocaleDateString(undefined, {
@@ -346,6 +371,7 @@ export function WeekPlanner({ tasks, blocks }: WeekPlannerProps) {
               ))}
             </div>
 
+            {/* Body: time labels + columns */}
             <div className="ff-plan-week-body">
               <div className="ff-plan-time-gutter">
                 {Array.from(
@@ -375,6 +401,8 @@ export function WeekPlanner({ tasks, blocks }: WeekPlannerProps) {
                   onBlockDragStart={handleBlockDragStart}
                   onCreateManualBlock={handleCreateManualBlock}
                   onEditBlock={handleEditBlock}
+                  onDeleteBlock={handleDeleteBlock}
+                  onResizeBlock={handleResizeBlock}
                 />
               ))}
             </div>
@@ -427,6 +455,8 @@ export function WeekPlanner({ tasks, blocks }: WeekPlannerProps) {
                 onBlockDragStart={handleBlockDragStart}
                 onCreateManualBlock={handleCreateManualBlock}
                 onEditBlock={handleEditBlock}
+                onDeleteBlock={handleDeleteBlock}
+                onResizeBlock={handleResizeBlock}
               />
             </div>
           </div>

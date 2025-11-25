@@ -31,9 +31,13 @@ export default function PlanPage() {
   const safeBlocks = Array.isArray(blocks) ? blocks : [];
 
   useEffect(() => {
-    loadTasks();
-    loadBlocks();
-  }, [loadTasks, loadBlocks]);
+    if (!tasksHydrated) {
+      void loadTasks();
+    }
+    if (!blocksHydrated) {
+      void loadBlocks();
+    }
+  }, [tasksHydrated, blocksHydrated, loadTasks, loadBlocks]);
 
   console.log(
     "[PlanPage] render:",
