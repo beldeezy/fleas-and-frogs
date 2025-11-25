@@ -1,7 +1,7 @@
 // src/components/plan/DayColumn.tsx
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import type { CalendarBlock } from "../../lib/schema";
 
 type DayColumnProps = {
@@ -79,7 +79,6 @@ function blockStyle(
   };
 }
 
-
 export function DayColumn({
   date,
   blocks,
@@ -97,6 +96,13 @@ export function DayColumn({
   const slotsPerHour = 60 / slotMinutes;
   const totalSlots = (dayEndHour - dayStartHour) * slotsPerHour;
 
+  // track which slot is currently being hovered during a drag
+  const [hoveredSlotIndex, setHoveredSlotIndex] = useState<number | null>(
+    null
+  );
+
+  const isDraggingSomething = !!draggingTaskId || !!draggingBlockId;
+
   const handleSlotDrop = (
     slotIndex: number,
     event: React.DragEvent<HTMLDivElement>
@@ -111,12 +117,12 @@ export function DayColumn({
 
     if (draggingTaskId) {
       onDropTaskIntoSlot(draggingTaskId, date, startHour, startMinute);
-      return;
-    }
-
-    if (draggingBlockId) {
+    } else if (draggingBlockId) {
       onDropBlockIntoSlot(draggingBlockId, date, startHour, startMinute);
     }
+
+    // clear hover state after drop
+    setHoveredSlotIndex(null);
   };
 
   const handleSlotDoubleClick = (slotIndex: number) => {
@@ -129,19 +135,35 @@ export function DayColumn({
     onCreateManualBlock(date, startHour, startMinute);
   };
 
+  const handleSlotDragOver = (
+    slotIndex: number,
+    event: React.DragEvent<HTMLDivElement>
+  ) => {
+    event.preventDefault();
+    if (!isDraggingSomething) return;
+    setHoveredSlotIndex(slotIndex);
+  };
+
   return (
     <div className="ff-plan-day-column">
       {/* Underlay: time slots */}
       <div className="ff-plan-day-slots">
-        {Array.from({ length: totalSlots }, (_, index) => (
-          <div
-            key={index}
-            className="ff-plan-slot"
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => handleSlotDrop(index, e)}
-            onDoubleClick={() => handleSlotDoubleClick(index)}
-          />
-        ))}
+        {Array.from({ length: totalSlots }, (_, index) => {
+          const isHover =
+            isDraggingSomething && hoveredSlotIndex === index;
+
+          return (
+            <div
+              key={index}
+              className={`ff-plan-slot ${
+                isHover ? "ff-plan-slot--hover" : ""
+              }`}
+              onDragOver={(e) => handleSlotDragOver(index, e)}
+              onDrop={(e) => handleSlotDrop(index, e)}
+              onDoubleClick={() => handleSlotDoubleClick(index)}
+            />
+          );
+        })}
       </div>
 
       {/* Overlay: blocks */}

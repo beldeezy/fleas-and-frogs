@@ -1,9 +1,9 @@
 "use client";
 
 import { useTaskStore } from "../../store/taskStore";
+import { TaskCard } from "../tasks/TaskCard";
 
 export function MindDumpTaskList() {
-  // Use simple selectors (no object creation in selector)
   const tasks = useTaskStore((s) => s.tasks);
   const hydrated = useTaskStore((s) => s.hydrated);
   const deleteTask = useTaskStore((s) => s.deleteTask);
@@ -27,33 +27,11 @@ export function MindDumpTaskList() {
 
       <ul className="ff-task-list">
         {mindDumpTasks.map((task) => (
-          <li
+          <TaskCard
             key={task.id}
-            className="ff-task"
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <span>{task.title}</span>
-
-            <button
-              onClick={() => handleDelete(task.id)}
-              aria-label="Delete task"
-              style={{
-                background: "transparent",
-                border: "none",
-                color: "rgba(255,255,255,0.35)",
-                cursor: "pointer",
-                fontSize: "1.1rem",
-                padding: "0.25rem",
-              }}
-              className="ff-icon-button"
-            >
-              🗑️
-            </button>
-          </li>
+            task={task}
+            onDelete={handleDelete}
+          />
         ))}
       </ul>
 

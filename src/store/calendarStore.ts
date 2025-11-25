@@ -17,10 +17,13 @@ const repoUpdateCalendarBlock: any = _repoUpdateCalendarBlock;
 const repoDeleteCalendarBlock: any = _repoDeleteCalendarBlock;
 
 // Small helpers
-const safeDeleteBlock = (blocks: CalendarBlock[], id: string): CalendarBlock[] => {
+const safeDeleteBlock = (
+  blocks: CalendarBlock[],
+  id: string
+): CalendarBlock[] => {
   const next = blocks.filter((b) => b.id !== id);
   if (next.length === blocks.length) {
-    console.warn("safeDeleteBlock: no block with id", id);
+    console.warn("[calendarStore.safeDeleteBlock] no block with id", id);
     return blocks;
   }
   return next;
@@ -40,7 +43,7 @@ const safeReplaceBlock = (
   });
 
   if (!found) {
-    console.warn("safeReplaceBlock: no block with id", saved.id);
+    console.warn("[calendarStore.safeReplaceBlock] no block with id", saved.id);
     return blocks;
   }
   return next;
@@ -82,7 +85,7 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
         error: null,
       });
     } catch (err) {
-      console.error("loadBlocks failed", err);
+      console.error("[calendarStore.loadBlocks] failed", err);
       set({
         blocks: [],
         isLoading: false,
@@ -96,12 +99,12 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
   async addBlock(input) {
     const prevBlocks = get().blocks ?? [];
     set({ isLoading: true, error: null });
-  
+
     try {
       console.log("[calendarStore.addBlock] input", input);
       const created = await addCalendarBlock(input);
       if (!created) throw new Error("addBlock: repo returned no block");
-  
+
       set({
         blocks: [...prevBlocks, created],
         isLoading: false,
@@ -116,38 +119,38 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
       });
     }
   },
-  
+
   async updateBlock(id, patch) {
     const prevBlocks = get().blocks ?? [];
     if (!prevBlocks.length) {
-      console.warn("updateBlock: no blocks in store");
+      console.warn("[calendarStore.updateBlock] no blocks in store");
       return;
     }
-  
+
     const existing = prevBlocks.find((b) => b.id === id);
     if (!existing) {
-      console.warn("updateBlock: no block with id", id);
+      console.warn("[calendarStore.updateBlock] no block with id", id);
       return;
     }
-  
+
     const localUpdated: CalendarBlock = {
       ...existing,
       ...patch,
       updatedAt: new Date().toISOString(),
     };
-  
+
     const optimistic = prevBlocks.map((b) =>
       b.id === id ? localUpdated : b
     );
-  
+
     console.log("[calendarStore.updateBlock] optimistic", localUpdated);
-  
+
     set({ blocks: optimistic, isLoading: true, error: null });
-  
+
     try {
       const saved: CalendarBlock = await repoUpdateCalendarBlock(localUpdated);
       set((state) => ({
-        blocks: safeReplaceBlock(state.blocks ?? [], saved),
+        blocks: safeReplaceBlock(state.blocks, saved),
         isLoading: false,
       }));
     } catch (err) {
@@ -156,11 +159,12 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
         blocks: prevBlocks,
         isLoading: false,
         error:
-          err instanceof Error ? err.message : "Failed to update calendar block",
+          err instanceof Error
+            ? err.message
+            : "Failed to update calendar block",
       });
     }
   },
-  
 
   async deleteBlock(id) {
     const prevBlocks = get().blocks ?? [];
@@ -173,12 +177,14 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
       await repoDeleteCalendarBlock(id);
       set({ isLoading: false });
     } catch (err) {
-      console.error("deleteBlock failed; rolling back", err);
+      console.error("[calendarStore.deleteBlock] failed; rolling back", err);
       set({
         blocks: prevBlocks,
         isLoading: false,
         error:
-          err instanceof Error ? err.message : "Failed to delete calendar block",
+          err instanceof Error
+            ? err.message
+            : "Failed to delete calendar block",
       });
     }
   },

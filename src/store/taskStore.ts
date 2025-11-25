@@ -172,18 +172,21 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       return;
     }
 
+    // 🔁 Local merged version (what we *intend* the task to become)
     const localUpdated: Task = { ...existing, ...patch };
 
-    // ✅ Optimistic local update
-    const optimistic = prevTasks.map((t) =>
-      t.id === id ? localUpdated : t
-    );
-
-    set({ tasks: optimistic, isLoading: true, error: null });
+    // ✅ Optimistic local update (no mutation)
+    set({
+      tasks: prevTasks.map((t) => (t.id === id ? localUpdated : t)),
+      isLoading: true,
+      error: null,
+    });
 
     try {
-      // ✅ Repo expects a full Task object
+      // Repo wants a full Task and returns the saved version
       const saved: Task = await repoUpdateTask(localUpdated);
+
+      // ✅ Replace with whatever the DB actually saved
       set((state) => ({
         tasks: safeReplaceTask(state.tasks ?? [], saved),
         isLoading: false,
@@ -198,6 +201,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       });
     }
   },
+
 
   async deleteTask(id) {
     const prevTasks = get().tasks ?? [];
@@ -224,7 +228,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     const prevTasks = get().tasks ?? [];
     set({ isLoading: true, error: null });
 
-    // ✅ Optimistic update uses the correct field: priorityId
+    // ✅ Optimistic update of priorityId
     const optimistic = prevTasks.map((t) =>
       t.id === id
         ? { ...t, priorityId: priorityId ?? undefined }
@@ -233,7 +237,9 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     set({ tasks: optimistic });
 
     try {
+      // Repo will read, merge, and return a full Task
       const updated: Task = await repoSetTaskPriority(id, priorityId);
+
       set((state) => ({
         tasks: safeReplaceTask(state.tasks ?? [], updated),
         isLoading: false,
@@ -251,17 +257,21 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }
   },
 
+
   async setTaskEisenhower(id, value) {
     const prevTasks = get().tasks ?? [];
     set({ isLoading: true, error: null });
 
+    // ✅ Optimistic update of Eisenhower quadrant
     const optimistic = prevTasks.map((t) =>
       t.id === id ? { ...t, eisenhower: value ?? undefined } : t
     );
     set({ tasks: optimistic });
 
     try {
+      // Repo reads, merges, and returns a full Task
       const updated: Task = await repoSetTaskEisenhower(id, value);
+
       set((state) => ({
         tasks: safeReplaceTask(state.tasks ?? [], updated),
         isLoading: false,
@@ -278,4 +288,5 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       });
     }
   },
+
 }));

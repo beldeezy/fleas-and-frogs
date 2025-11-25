@@ -36,7 +36,7 @@ export default function PlanPage() {
   }, [loadTasks, loadBlocks]);
 
   console.log(
-    "PlanPage render:",
+    "[PlanPage] render:",
     "hydrated=",
     hydrated,
     "tasks=",
@@ -45,7 +45,7 @@ export default function PlanPage() {
     safeBlocks.length
   );
 
-  const hasError = taskError || blocksError;
+  const hasError = !!(taskError || blocksError);
 
   return (
     <main className="ff-container">

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { useTaskStore } from "../../src/store/taskStore"; // <-- adjust if needed
-import { usePriorityStore } from "../../src/store/priorityStore"; // <-- adjust
+import { useTaskStore } from "../../src/store/taskStore";
+import { usePriorityStore } from "../../src/store/priorityStore";
 import { DndProvider } from "../../src/components/dnd/DndProvider";
 import { EisenhowerMatrix } from "../../src/components/strategize/EisenhowerMatrix";
 
@@ -33,7 +33,7 @@ export default function StrategizePage() {
     loadPriorities();
   }, [loadTasks, loadPriorities]);
 
-  // lightweight breadcrumb for debugging render/hydration behavior
+  // breadcrumb for debugging render/hydration behavior
   console.log(
     "StrategizePage render:",
     "hydrated=",

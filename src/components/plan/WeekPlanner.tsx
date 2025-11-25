@@ -49,7 +49,6 @@ export function WeekPlanner({ tasks, blocks }: WeekPlannerProps) {
   const [slotMinutes, setSlotMinutes] = useState<number>(30);
   const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
   const [draggingBlockId, setDraggingBlockId] = useState<string | null>(null);
-
   const [leavingTasks, setLeavingTasks] = useState<Set<string>>(new Set());
 
   const addBlock = useCalendarStore((s) => s.addBlock);
@@ -267,13 +266,12 @@ export function WeekPlanner({ tasks, blocks }: WeekPlannerProps) {
     <div className="ff-plan-layout">
       {/* LEFT SIDEBAR */}
       <aside className="ff-plan-sidebar">
-      <ScheduleSidebar
-        unscheduled={unscheduledTasks}
-        scheduled={scheduledTasks}
-        leavingTasks={leavingTasks}    // ← REQUIRED
-        onTaskDragStart={handleTaskDragStart}
-      />
-
+        <ScheduleSidebar
+          unscheduled={unscheduledTasks}
+          scheduled={scheduledTasks}
+          leavingTasks={leavingTasks}
+          onTaskDragStart={handleTaskDragStart}
+        />
       </aside>
 
       {/* RIGHT: Calendar */}

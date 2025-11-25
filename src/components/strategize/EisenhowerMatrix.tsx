@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type DragEvent } from "react";
-import type { Task, EisenhowerValue } from "../../lib/schema"; // <-- adjust
+import type { Task, EisenhowerValue } from "../../lib/schema";
 import { EisenhowerGrid } from "./EisenhowerGrid";
 import { TaskCard } from "../tasks/TaskCard";
 
@@ -22,8 +22,10 @@ export function EisenhowerMatrix({
 }: EisenhowerMatrixProps) {
   const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
 
+  // Tasks with no Eisenhower quadrant yet
   const unsorted = tasksForPriority.filter((t) => !t.eisenhower);
 
+  // Tasks grouped by quadrant
   const byQuadrant: Record<EisenhowerValue, Task[]> = {
     now: tasksForPriority.filter((t) => t.eisenhower === "now"),
     plan: tasksForPriority.filter((t) => t.eisenhower === "plan"),
@@ -40,7 +42,7 @@ export function EisenhowerMatrix({
 
     const task = tasksForPriority.find((t) => t.id === draggingTaskId);
     if (!task || task.priorityId !== priorityId) {
-      // Only allow dropping into its own Life Priority matrix
+      // Only allow dropping tasks that belong to this Life Priority
       setDraggingTaskId(null);
       return;
     }
@@ -53,11 +55,22 @@ export function EisenhowerMatrix({
   };
 
   const handleUnsortedDragOver = (e: DragEvent<HTMLDivElement>) => {
-    // Just to allow smooth drag leave/enter; no drop here.
+    // Allow drag-over so the drag doesn't cancel when hovering this area
     e.preventDefault();
   };
 
-  // lightweight breadcrumb for debugging this layer if needed
+  const handleEisenhowerChange = async (
+    taskId: string,
+    value: EisenhowerValue
+  ) => {
+    try {
+      await setTaskEisenhower(taskId, value);
+    } catch (err) {
+      console.error("Failed to set Eisenhower value:", err);
+    }
+  };
+
+  // breadcrumb for debugging this layer if needed
   console.log(
     "EisenhowerMatrix render:",
     priorityName,
@@ -87,14 +100,18 @@ export function EisenhowerMatrix({
       >
         <h3>Unsorted tasks</h3>
         <p className="ff-hint">
-          Drag these into a quadrant above to place them.
+          Drag these into a quadrant above, or choose a quadrant from the
+          dropdown.
         </p>
+
         <ul className="ff-task-list">
           {unsorted.map((task) => (
             <TaskCard
               key={task.id}
               task={task}
               onDragStart={handleDragStart}
+              // also allow setting Eisenhower via dropdown on the card
+              onEisenhowerChange={handleEisenhowerChange}
             />
           ))}
         </ul>
